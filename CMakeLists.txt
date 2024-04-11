@@ -22,9 +22,7 @@ find_package(catkin REQUIRED COMPONENTS
     roscpp 
     tf
     sensor_msgs
-    # cv_bridge
     std_msgs
-    
 #    image_transport   
     )
 
@@ -33,12 +31,11 @@ find_package(OpenCV REQUIRED)
 include_directories(
     ${catkin_INCLUDE_DIRS} 
     ${OpenCV_INCLUDE_DIRS}
-    ./include)
-# Use this to define what the package will export (e.g. libs, headers).
-# Since the default here is to produce only a binary, we don't worry about
-# exporting anything. 
-catkin_package()
+    ./include
+    ./comm
+)
 
+catkin_package()
 ##############################################################################
 # Qt Environment
 ##############################################################################
@@ -68,6 +65,7 @@ foreach(QtModule ${ModuleList})
 endforeach()
 message("${QT_LIBRARIES}")
 
+add_subdirectory(comm)
 #######
 
 ##############################################################################
@@ -98,9 +96,29 @@ file(GLOB_RECURSE QT_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} FOLLOW_SYMLINK
 # Binaries
 ##############################################################################
 
+find_library(cv_bridge_LIBRARIES
+  NAMES cv_bridge
+  DOC "cv_bridge library")
+
+find_library(blas_LIBRARIES
+NAMES blas
+DOC "blas library")
+
+find_library(gdal_LIBRARIES
+NAMES gdal
+DOC "gdal library")
+
 add_executable(my_gui_app ${QRC_FILES} ${QT_SOURCES} ${QT_RESOURCES_CPP} 
                                         ${QT_FORMS_HPP} ${QT_MOC_HPP})
-target_link_libraries(my_gui_app ${QT_LIBRARIES} ${catkin_LIBRARIES} ${OpenCV_LIBS})
+target_link_libraries(my_gui_app 
+    ${QT_LIBRARIES} 
+    ${catkin_LIBRARIES} 
+    ${cv_bridge_LIBRARIES}
+    ${blas_LIBRARIES}
+    ${gdal_LIBRARIES}
+    ${OpenCV_LIBS}
+    client_comm_lib
+)
 install(TARGETS my_gui_app RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 #############################################################################

@@ -36,6 +36,7 @@
 #include <sensor_msgs/LaserScan.h>
 #include <sensor_msgs/PointCloud2.h>
 #include <sensor_msgs/image_encodings.h>  //图像编码格式
+
 #include <std_msgs/Float32.h>
 #include <std_msgs/Float64.h>
 #include <std_msgs/Bool.h>
@@ -52,18 +53,12 @@
 #include <string>
 
 #include "roboItem.h"
+#include "msg/laserWheelCalibRes.h"
+#include "ui_MainWindow.h"    // build/my_gui下
 
 typedef actionlib::SimpleActionClient<move_base_msgs::MoveBaseAction>
     MoveBaseClient;
-/*****************************************************************************
-** Namespaces
-*****************************************************************************/
-
 namespace ros_qt {
-
-/*****************************************************************************
-** Class
-*****************************************************************************/
 
 class QNode : public QThread {
   Q_OBJECT
@@ -72,10 +67,15 @@ class QNode : public QThread {
   virtual ~QNode();
   bool init();
   bool init(const std::string &master_url, const std::string &host_url);
+  void addRobot(roboItem *roboItem);
   void move_base(char k, float speed_linear, float speed_trun);
   void set_goal(QString frame, double x, double y, double z, double w);
   void SetReset();
   void SetGridMapShowFlag(bool flag);
+  void setMainWindowUi(Ui::MainWindow *ui);
+  void SetWheelOdomSubscribe(bool flag);
+  // 服务
+  void laserWheelCalibCall(uint8_t task, bool& result);
   // void SubImage(QString topic, int frame_id);
 //  void pub_imageMap(QImage map);
   QPointF transScenePoint2Word(QPointF pos);
@@ -103,16 +103,17 @@ class QNode : public QThread {
   void speed_y(double y);
   void batteryState(sensor_msgs::BatteryState);
   void Master_shutdown();
-  void Show_image(int, QImage);
+  void showImage(int, QImage);
   void updateRoboPose(RobotPose pos);
   void updateMap(QImage map);
   void updateSubGridMap(QImage map, QPointF mapOrigin, float res, int width, int height);
   void plannerPath(QPolygonF path);
+  void wheelOdomPathSignals(QPolygonF path);
   void updateStableLaserScan(QPolygonF points);
   void updateDynamicLaserScan(QPolygonF points);
-  void updateRobotStatus(RobotStatus status);
+  void updateRobotStatus(RobotStatus status);  
 
- private:
+private:
   int init_argc;
   char **init_argv;
   ros::Publisher chatter_publisher;
@@ -123,12 +124,15 @@ class QNode : public QThread {
   ros::Subscriber dynamic_laser_point_sub_;
   ros::Subscriber battery_sub;
   ros::Subscriber m_plannerPathSub;
-  ros::Subscriber m_compressedImgSub0;
+  ros::Subscriber wheelOdom_sub;
+  ros::Subscriber m_compressedImgSub0_;
   ros::Subscriber m_compressedImgSub1;
+  ros::Subscriber laserWheelCalibResSub;
   ros::Publisher goal_pub;
   ros::Publisher cmd_pub;
   ros::Publisher reset_pub;
   ros::Publisher m_initialposePub;
+  ros::ServiceClient laserWheelCalib_client;
 //  image_transport::Publisher m_imageMapPub;
   MoveBaseClient *movebase_client;
   QStringListModel logging_model;
@@ -150,6 +154,7 @@ class QNode : public QThread {
   std::string path_topic;
   QPolygon mapPonits;
   QPolygonF plannerPoints;
+  QPolygonF wheelOdom_path;
   QPolygonF stableLaserPoints;
   QPolygonF dynamicLaserPoints;
   int m_threadNum = 2;
@@ -173,11 +178,13 @@ class QNode : public QThread {
   tf::TransformListener *m_robotPoselistener;
   tf::TransformListener *m_Laserlistener;
   std::string base_frame, laser_frame, map_frame;
+  roboItem *roboItem_ = nullptr;
+  Ui::MainWindow *ui_;
 
  private:
   void speedCallback(const nav_msgs::Odometry::ConstPtr &msg);
   void batteryCallback(const sensor_msgs::BatteryState &message);
-  // void imageCallback0(const sensor_msgs::CompressedImageConstPtr &msg);
+   void imageCallback0(const sensor_msgs::ImageConstPtr &msg);
   // void imageCallback1(const sensor_msgs::CompressedImageConstPtr &msg);
   void myCallback(const std_msgs::Float64 &message_holder);
   void gridmapCallback(nav_msgs::OccupancyGrid::ConstPtr map);
@@ -186,6 +193,9 @@ class QNode : public QThread {
   void stableLaserPointCallback(sensor_msgs::PointCloudConstPtr laser_msg);
   void dynamicLaserPointCallback(sensor_msgs::PointCloudConstPtr laser_msg);
   void plannerPathCallback(nav_msgs::Path::ConstPtr path);
+  void wheelOdomCallback(nav_msgs::Odometry wheel_odom);
+  void laserOdomPathCallback(nav_msgs::Path::ConstPtr path);
+  void laserWheelCalibCallback(const calib_fusion_2d::laserWheelCalibResConstPtr& msg);
   void SubAndPubTopic();
   void updateRobotPose();
 };

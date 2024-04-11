@@ -3,8 +3,10 @@
 
 #include <QWidget>
 #include <QProcess>
+#include <QKeyEvent>
 #include "qnode.hpp"
 #include "roboItem.h"
+#include "client/socket_comm.hpp"
 
 namespace Ui {
 class MainWindow;
@@ -27,6 +29,8 @@ protected:
    */
   QString getLocalIpAddress();
 
+  void keyPressEvent(QKeyEvent* event) override;
+
   /**
    * @brief MainWindow::connection 信号与槽的连接
    */
@@ -48,6 +52,33 @@ protected:
   void bringUpQtRosNode();
 
   void viewCenterFocusOnRobot();
+
+private slots:
+  void on_toolButton_7_clicked();
+
+private slots:
+  void on_toolButton_4_clicked();
+
+private slots:
+  void on_toolButton_5_clicked();
+
+private slots:
+  void on_toolButton_3_clicked();
+
+private slots:
+  void on_checkBox_7_stateChanged(int arg1);
+
+private slots:
+  void on_pushButton_8_clicked();
+
+private slots:
+  void on_pushButton_4_clicked();
+
+private slots:
+  void on_pushButton_6_clicked();
+
+private slots:
+  void on_checkBox_stateChanged(int arg1);
 
 private slots:
   void on_localgridmap_checkBox_stateChanged(int arg1);
@@ -79,10 +110,12 @@ private:
   QProcess *frontend_process_;
   QProcess *laser_process_;
   QProcess *hardware_process_;
+  QProcess *recordBag_process_;
   ros_qt::QNode qt_ros_node_;
 
   QGraphicsScene *qgraphicsScene_ = NULL;
   ros_qt::roboItem *roboItem_ = NULL;
+  Comm::SocketClient client_;
 };
 
 #endif // MainWindow_H

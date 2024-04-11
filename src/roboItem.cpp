@@ -19,6 +19,8 @@ roboItem::roboItem() {
   setDefaultScale();
   laser_upside_down_ = false;   // 雷达颠倒
   visual_mode_ = VisualMode::internal_tracking;
+  param.linear_v = 0.5;
+  param.angular_v = 0.175;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -37,7 +39,7 @@ void roboItem::setRobotVis(eRobotColor color) {
   QMatrix matrix;
   matrix.rotate(90);
   robotImg = robotImg.transformed(matrix, Qt::SmoothTransformation);
-  robotImg = robotImg.scaled(robotImg.width() * 4, robotImg.height() * 4);
+  robotImg = robotImg.scaled(robotImg.width() * 2, robotImg.height() * 2);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -97,6 +99,19 @@ void roboItem::paintDynamicLaserScan(QPolygonF points) {
 ///
 void roboItem::paintPlannerPath(QPolygonF path) {
   plannerPath = path;
+  update();
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+void roboItem::paintWheelOdomPath(QPolygonF path) {
+  // std::cout << "paintWheelOdomPath" << std::endl;
+  // 转图元item系
+  for (int i = 0; i < path.size(); ++i) {
+    // 转图元系
+    path[i].setX(path[i].x() / map_resolution_);
+    path[i].setY(-path[i].y() / map_resolution_);
+  }
+  wheelOdomPath = path;
   update();
 }
 
@@ -197,6 +212,7 @@ void roboItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
     }
     drawRoboPos(painter);
   //  drawPlannerPath(painter);
+    drawWheelOdomPath(painter);
     drawLaserScan(painter);
   //  drawTools(painter);
 //      float time =(double)mstimer.nsecsElapsed()/(double)1000000;
@@ -290,8 +306,15 @@ void roboItem::drawLaserScan(QPainter* painter) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 void roboItem::drawPlannerPath(QPainter *painter) {
   //绘制planner Path
-  painter->setPen(QPen(QColor(0, 0, 0, 255), 1 / expansion_coef_));
+  painter->setPen(QPen(QColor(0, 0, 0, 255), 1));
   painter->drawPoints(plannerPath);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+void roboItem::drawWheelOdomPath(QPainter *painter) {
+  //绘制planner Path
+  painter->setPen(QPen(QColor(0, 255, 255, 255), 1 / expansion_coef_));
+  painter->drawPoints(wheelOdomPath);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -328,7 +351,7 @@ void roboItem::setMin() {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 void roboItem::setDefaultScale() {
-  m_scaleValue = 0.2;
+  m_scaleValue = 0.5;
   this->setScale(m_scaleValue);
 //  this->moveBy(0, 0);
 }
@@ -424,7 +447,7 @@ void roboItem::mousePressEvent(QGraphicsSceneMouseEvent *event) {
 //    qDebug() << "mousePressEvent";
   if (event->button() == Qt::LeftButton) {
     m_startPose = event->pos();  //鼠标左击时，获取当前鼠标在图片中的坐标，
-    qDebug() << "Press pos x: " << m_startPose.x() << ",y: " << m_startPose.y();
+    // qDebug() << "Press pos x: " << m_startPose.x() << ",y: " << m_startPose.y();
     m_isMousePress = true;  //标记鼠标左键被按下
   } else if (event->button() == Qt::RightButton) {
     // ResetItemPos();//右击鼠标重置大小
@@ -470,6 +493,11 @@ void roboItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
   }
   m_startPose=QPointF();
   m_endPose=QPointF();
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+void roboItem::clearWheelPath() {
+  wheelOdomPath.clear();
 }
 
 }  // namespace ros_qt5_gui_app
