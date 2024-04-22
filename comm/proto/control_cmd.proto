@@ -1,0 +1,8 @@
+syntax = "proto3";
+package comm.cmd.proto;
+
+message ControlCmd {
+    string cmd = 1;  
+    repeated float linear_v = 2;
+    float rotation_v = 3;
+}

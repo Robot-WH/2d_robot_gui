@@ -196,7 +196,7 @@ void roboItem::transformMapFromLaserOdomToOdom(QImage& map) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 void roboItem::paintRoboPos(RobotPose pos) {
-//  qDebug()<<"pos:"<<pos.x<<" "<<pos.y<<" "<<pos.theta;
+ // qDebug()<<"pos:"<<pos.x<<" "<<pos.y<<" "<<pos.theta;
   RoboPostion = QPointF(pos.x / map_resolution_, -pos.y / map_resolution_);   // y坐标颠倒
   m_roboYaw = pos.theta;
   update();
@@ -207,6 +207,7 @@ void roboItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
                                           QWidget *widget) {
 //    QElapsedTimer mstimer;
 //    mstimer.start();
+    std::cout << "paint" << "\n";
     if (show_gridmap_flag) {
       drawGridMap(painter);
     }

@@ -1,8 +1,6 @@
 /**
  * @file /src/qnode.cpp
- *
  * @brief Ros communication central!
- *
  * @date February 2011
  **/
 /*****************************************************************************
@@ -10,6 +8,7 @@
 *****************************************************************************/
 #include "qnode.hpp"
 #include "srv/laserWheelCalib.h"
+#include "proto/obs.pb.h"
 
 #include <ros/network.h>
 #include <ros/ros.h>
@@ -94,26 +93,30 @@ void QNode::SubAndPubTopic() {
   //                            &QNode::batteryCallback, this);
   // 地图订阅
   QString occ_grid_topic = settings.value("Map/occ_grid_topic", QString("/map")).toString();
-  map_sub = n.subscribe(occ_grid_topic.toStdString(), 1000, &QNode::gridmapCallback, this);
-  // 速度控制话题
-   cmd_pub = n.advertise<geometry_msgs::Twist>("cmd_vel", 1000);
-  // 重置设置话题
-  reset_pub = n.advertise<std_msgs::Bool>("cmd_reset", 1);
+  map_sub = n.subscribe(occ_grid_topic.toStdString(), 1, &QNode::gridmapCallback, this);
   // 激光雷达点云话题订阅
   stable_laser_point_topic = settings.value("Laser/stable_laser_point", QString("/stable_laser_points")).toString();
-  stable_laser_point_sub_ = n.subscribe(stable_laser_point_topic.toStdString(), 1000,
+  stable_laser_point_sub_ = n.subscribe(stable_laser_point_topic.toStdString(), 1,
                            &QNode::stableLaserPointCallback, this);
   //  qDebug() << "stable_laser_point_topic: " << stable_laser_point_topic;
-
+  std::string fusion_odom_topic = "odom_Fusion";
+  fusion_odom_sub_ = n.subscribe(fusion_odom_topic, 1,
+                                 &QNode::fusionOdomCallback, this);
   dynamic_laser_point_topic = settings.value("Laser/dynamic_laser_point_topic", QString("/dynamic_laser_points")).toString();
-  dynamic_laser_point_sub_ = n.subscribe(dynamic_laser_point_topic.toStdString(), 1000,
+  dynamic_laser_point_sub_ = n.subscribe(dynamic_laser_point_topic.toStdString(), 1,
                            &QNode::dynamicLaserPointCallback, this);
 //  qDebug() << "stable_laser_point_topic: " << stable_laser_point_topic;
   // 图像话题的回调
-  m_compressedImgSub0_ = n.subscribe("front_camera", 10,
+  m_compressedImgSub0_ = n.subscribe("front_camera", 1,
                                      &QNode::imageCallback0, this);
-  laserWheelCalibResSub = n.subscribe("laserWheelCalibRes", 1,
+  laserWheelCalibResSub = n.subscribe("laserWheelCalibRes", 10,
                                       &QNode::laserWheelCalibCallback, this);
+
+  // 速度控制话题
+   cmd_pub = n.advertise<geometry_msgs::Twist>("cmd_vel", 10);
+  // 重置设置话题
+  reset_pub = n.advertise<std_msgs::Bool>("cmd_reset", 1);
+
 //  image_transport::ImageTransport it(n);
 //  m_imageMapPub = it.advertise("image/map", 10);
 
@@ -128,15 +131,6 @@ void QNode::SubAndPubTopic() {
   laserWheelCalib_client = n.serviceClient<calib_fusion_2d::laserWheelCalib>("/laserWheelCalib");
   m_robotPoselistener = new tf::TransformListener;
   m_Laserlistener = new tf::TransformListener;
-//  try {
-//    m_robotPoselistener->waitForTransform(map_frame, base_frame, ros::Time(0),
-//                                          ros::Duration(0.4));
-//    m_Laserlistener->waitForTransform(map_frame, laser_frame, ros::Time(0),
-//                                      ros::Duration(0.4));
-//  } catch (tf::TransformException& ex) {
-//    log(Error, ("laser and robot pose tf listener: " + QString(ex.what()))
-//                   .toStdString());
-//  }
 //  movebase_client = new MoveBaseClient("move_base", true);
 //  movebase_client->waitForServer(ros::Duration(1.0));
 }
@@ -158,9 +152,48 @@ QMap<QString, QString> QNode::get_topic_list() {
   return res;
 }
 
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
-void QNode::addRobot(roboItem *roboItem) {
-  roboItem_ = roboItem;
+void QNode::run() {
+  ros::Rate loop_rate(m_frameRate);
+  // 使用 ros::AsyncSpinner 可以使这些回调在后台线程中异步地执行，而不是在主线程中同步地执行。
+  // 这允许你的主线程继续执行其他任务，而不是被回调阻塞。
+  // ros::AsyncSpinner spinner(m_threadNum);
+  // spinner.start();
+  //当当前节点没有关闭时
+  while (ros::ok()) {
+    // updateRobotPose();      // 通过tf获取机器人位姿   弃用
+//    emit updateRobotStatus(RobotStatus::normal);
+    sendDataToServer();
+    ros::spinOnce();
+    loop_rate.sleep();    // 没有ros 消息的话会一直阻塞
+  }
+  //如果当前节点关闭
+  Q_EMIT
+  rosShutdown();  // used to signal the gui for a shutdown (useful to roslaunch)
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// \brief QNode::sendDataToServer
+///
+void QNode::sendDataToServer() {
+  // std::unique_lock<std::mutex> lock(mt_obs_); // 锁定互斥锁
+  // cv_obs_.wait(lock, [this] { return this->ready_pose_ && this->ready_stable_laser_point_; }); // 等待 ready 标志位为 true
+  comm::obs::proto::ObsPacket obs_packet;
+  obs_packet.set_timestamp(fusion_pose_.first);
+  obs_packet.add_pose(fusion_pose_.second.x);
+  obs_packet.add_pose(fusion_pose_.second.y);
+  obs_packet.add_pose(fusion_pose_.second.theta);
+  // 添加stableLaserPoints 激光点云
+  for (int i = 0; i < stableLaserPoints.size(); ++i) {
+    comm::pose::proto::Vector2f* point = obs_packet.add_stable_laser_points();
+    point->set_x(stableLaserPoints[i].x());
+    point->set_y(stableLaserPoints[i].y());
+  }
+  // 序列化protobuf消息
+  std::string serialized_message;
+  obs_packet.SerializeToString(&serialized_message);
+  client_.Send(1, serialized_message);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -174,6 +207,25 @@ void QNode::plannerPathCallback(nav_msgs::Path::ConstPtr path) {
     plannerPoints.append(roboPos);
   }
   emit plannerPath(plannerPoints);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+void QNode::fusionOdomCallback(const nav_msgs::Odometry& fusion_odom) {
+  // 提取四元数旋转信息
+  geometry_msgs::Quaternion quat = fusion_odom.pose.pose.orientation;
+  // 将四元数转换为欧拉角
+  tf::Quaternion q(quat.x, quat.y, quat.z, quat.w);
+  tf::Matrix3x3 mat(q);
+  double roll, pitch, yaw;
+  mat.getRPY(roll, pitch, yaw);
+  fusion_pose_.first = fusion_odom.header.stamp.toSec();
+  fusion_pose_.second.x = fusion_odom.pose.pose.position.x;
+  fusion_pose_.second.y = fusion_odom.pose.pose.position.y;
+  fusion_pose_.second.theta = yaw;
+  emit updateRoboPose(fusion_pose_.second);
+  // fusion_pose_pm_.set_value(std::make_pair(fusion_odom.header.stamp.toSec(), pos));
+  // ready_pose_ = true;
+  // cv_obs_.notify_one();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -206,12 +258,13 @@ void QNode::laserOdomPathCallback(nav_msgs::Path::ConstPtr path) {
 ///
 void QNode::stableLaserPointCallback(sensor_msgs::PointCloudConstPtr laser_msg) {
   stableLaserPoints.clear();
-
   for (int i = 0; i < (int)laser_msg->points.size(); i++) {
     QPointF pos(laser_msg->points[i].x, laser_msg->points[i].y);
     stableLaserPoints.append(pos);
   }
   emit updateStableLaserScan(stableLaserPoints);
+  // ready_stable_laser_point_ = true;
+  // cv_obs_.notify_one();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -371,22 +424,6 @@ void QNode::laserWheelCalibCallback(const calib_fusion_2d::laserWheelCalibResCon
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
-void QNode::run() {
-  ros::Rate loop_rate(m_frameRate);
-  ros::AsyncSpinner spinner(m_threadNum);
-  spinner.start();
-  //当当前节点没有关闭时
-  while (ros::ok()) {
-    updateRobotPose();
-//    emit updateRobotStatus(RobotStatus::normal);
-    loop_rate.sleep();    // 没有ros 消息的话会一直阻塞
-  }
-  //如果当前节点关闭
-  Q_EMIT
-  rosShutdown();  // used to signal the gui for a shutdown (useful to roslaunch)
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// \brief QNode::move_base 发布机器人速度控制
 /// \param k
 /// \param speed_linear
@@ -479,7 +516,7 @@ void QNode::pub2DGoal(QPointF start_pose,QPointF end_pose){
 }
 
 
-
+////////////////////////////////////////////////////////////////////////////////////////////////////////
 //void QNode::pub_imageMap(QImage map) {
 //  cv::Mat image = QImage2Mat(map);
 //  sensor_msgs::ImagePtr msg =
@@ -599,6 +636,10 @@ void QNode::SetWheelOdomSubscribe(bool flag) {
   }
 }
 
+bool QNode::SocketClientConnect(const int& port, const std::string& ip) {
+  return client_.Connect(port, ip);
+}
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 QPointF QNode::transScenePoint2Word(QPointF pose) {
   QPointF res;
@@ -704,6 +745,5 @@ void QNode::log(const LogLevel& level, const std::string& msg) {
                         new_row);
   Q_EMIT loggingUpdated();  // used to readjust the scrollbar
 }
-
 
 }  // namespace ros_qt5_gui_app

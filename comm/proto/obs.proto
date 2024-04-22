@@ -1,0 +1,10 @@
+syntax = "proto3";
+package comm.obs.proto;
+import "pose.proto";
+
+message ObsPacket {
+    uint32 type = 1;  
+    double timestamp = 2;
+    repeated double pose = 3;
+    repeated pose.proto.Vector2f stable_laser_points = 4;
+}

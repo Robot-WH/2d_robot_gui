@@ -108,9 +108,9 @@ find_library(gdal_LIBRARIES
 NAMES gdal
 DOC "gdal library")
 
-add_executable(my_gui_app ${QRC_FILES} ${QT_SOURCES} ${QT_RESOURCES_CPP} 
+add_executable(robot_gui ${QRC_FILES} ${QT_SOURCES} ${QT_RESOURCES_CPP} 
                                         ${QT_FORMS_HPP} ${QT_MOC_HPP})
-target_link_libraries(my_gui_app 
+target_link_libraries(robot_gui 
     ${QT_LIBRARIES} 
     ${catkin_LIBRARIES} 
     ${cv_bridge_LIBRARIES}
@@ -119,7 +119,7 @@ target_link_libraries(my_gui_app
     ${OpenCV_LIBS}
     client_comm_lib
 )
-install(TARGETS my_gui_app RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+install(TARGETS robot_gui RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 #############################################################################
 #HTML 将html文件拷贝到可执行文件同级目录

@@ -6,7 +6,6 @@
 #include <QKeyEvent>
 #include "qnode.hpp"
 #include "roboItem.h"
-#include "client/socket_comm.hpp"
 
 namespace Ui {
 class MainWindow;
@@ -28,8 +27,9 @@ protected:
    * @return
    */
   QString getLocalIpAddress();
-
+  void serverMsgCallback(const std::pair<uint8_t, std::string>& msg);
   void keyPressEvent(QKeyEvent* event) override;
+  void simulateKeyPress(int keyCode, Qt::KeyboardModifiers modifiers);
 
   /**
    * @brief MainWindow::connection 信号与槽的连接
@@ -115,7 +115,6 @@ private:
 
   QGraphicsScene *qgraphicsScene_ = NULL;
   ros_qt::roboItem *roboItem_ = NULL;
-  Comm::SocketClient client_;
 };
 
 #endif // MainWindow_H

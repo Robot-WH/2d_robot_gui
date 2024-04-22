@@ -11,6 +11,8 @@
 
 #include "MainWindow.h"
 #include "ui_MainWindow.h"    // build/my_gui下 
+#include "ipc/DataDispatcher.hpp"
+#include "proto/control_cmd.pb.h"
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 MainWindow::MainWindow(int argc, char **argv, QWidget *parent) :
@@ -157,7 +159,6 @@ void MainWindow::initUI() {
   qgraphicsScene_->clear();
   //创建item
   roboItem_ = new ros_qt::roboItem();
-  qt_ros_node_.addRobot(roboItem_);
   //视图添加item
   qgraphicsScene_->addItem(roboItem_);
   // widget添加视图
@@ -307,6 +308,70 @@ void MainWindow::connection() {
   // 接收轮速轨迹->绘制轮速轨迹
   connect(&qt_ros_node_, &ros_qt::QNode::wheelOdomPathSignals, roboItem_,
           &ros_qt::roboItem::paintWheelOdomPath);
+
+  ipc::DataDispatcher::GetInstance().Subscribe("ServerMsg",
+                                                                                              &MainWindow::serverMsgCallback,
+                                                                                              this,
+                                                                                              1000,
+                                                                                              true);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// \brief MainWindow::simulateKeyPress   模拟键盘按下事件
+/// \param keyCode
+/// \param modifiers
+///
+void MainWindow::simulateKeyPress(int keyCode, Qt::KeyboardModifiers modifiers) {
+    QKeyEvent event(QEvent::KeyPress, keyCode, modifiers);
+    QCoreApplication::sendEvent(this, &event);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// \brief MainWindow::serverMsgCallback
+/// \param msg
+///
+void MainWindow::serverMsgCallback(const std::pair<uint8_t, std::string>& msg) {
+  // 反序列化
+  std::cout << "接收到信号" << "\n";
+  if (msg.first == 1) {
+    std::cout << "接收到控制信号" << "\n";
+    comm::cmd::proto::ControlCmd control_cmd_packet;
+    if (control_cmd_packet.ParseFromString(msg.second)) {
+      // qt_ros_node_.move_base(control_cmd_packet.cmd()[0],
+      //                                                       roboItem_->param.linear_v, roboItem_->param.angular_v);
+      // std::cout << "control_cmd_packet.cmd()[0]: " << control_cmd_packet.cmd()[0] << "\n";
+      char key = control_cmd_packet.cmd()[0];
+      if (key == 'a') {
+        simulateKeyPress(Qt::Key_A, Qt::NoModifier); // 模拟按下 'A' 键
+      } else if (key == 'd') {
+        simulateKeyPress(Qt::Key_D, Qt::NoModifier);
+      } else if (key == 'w') {
+        simulateKeyPress(Qt::Key_W, Qt::NoModifier);
+      } else if (key == 'x') {
+        simulateKeyPress(Qt::Key_X, Qt::NoModifier);
+      } else if (key == 's') {
+        simulateKeyPress(Qt::Key_S, Qt::NoModifier);
+      } else if (key == 'q') {
+        simulateKeyPress(Qt::Key_Q, Qt::NoModifier);
+      } else if (key == 'e') {
+        simulateKeyPress(Qt::Key_E, Qt::NoModifier);
+      } else if (key == 'z') {
+        simulateKeyPress(Qt::Key_Z, Qt::NoModifier);
+      } else if (key == 'c') {
+        simulateKeyPress(Qt::Key_C, Qt::NoModifier);
+      } else if (key == '7') {
+        simulateKeyPress(Qt::Key_7, Qt::NoModifier);
+      } else if (key == '8') {
+        simulateKeyPress(Qt::Key_8, Qt::NoModifier);
+      } else if (key == '9') {
+        simulateKeyPress(Qt::Key_9, Qt::NoModifier);
+      } else if (key == '0') {
+        simulateKeyPress(Qt::Key_0, Qt::NoModifier);
+      }
+    } else {
+      std::cout << "解析错误" << "\n";
+    }
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -426,12 +491,14 @@ void MainWindow::on_server_connect_Button_clicked() {
     QString port = ui->line_port_Edit->text();
     qDebug() << "ip: " << ip;
     qDebug() << "port: " << port;
-    if (client_.Connect(port.toInt(), ip.toStdString()) == 1) {
+    if (qt_ros_node_.SocketClientConnect(port.toInt(), ip.toStdString()) == 1) {
       QPalette palette = ui->label_6->palette();  // 获取QLabel的调色板
       palette.setColor(QPalette::WindowText, Qt::green);  // 设置文字颜色为红色
       ui->label_6->setPalette(palette);  // 应用新的调色板
       ui->label_6->setText("服务器已连接");
       ui->server_connect_Button->setDisabled(true);
+    } else {
+      ui->label_6->setText("服务器连接失败");
     }
     // // 连接服务器
     // if (::connect(sockfd, (struct sockaddr*)&address, sizeof(address)) < 0) {
@@ -455,6 +522,7 @@ void MainWindow::slot_roboPos(QPointF pos) {
   QPointF ViewPos = ui->mapViz->mapFromScene(ScenePos);
   QRect view_rect = ui->mapViz->viewport()->rect();   // 获取视图坐标范围
 //  qDebug() << "ViewPos.x(): " << ViewPos.x() << ", y: " << ViewPos.y();
+  // 如果机器人移动到了窗口边缘，则要将窗口中心调整到机器人处
   if (ViewPos.x() < view_rect.width() * 0.2 || ViewPos.x() > view_rect.width() * 0.8
         || ViewPos.y() < view_rect.height() * 0.2 || ViewPos.y() > view_rect.height() * 0.8) {
     // 视图中心的item坐标系坐标
@@ -611,35 +679,6 @@ void MainWindow::on_checkBox_7_stateChanged(int arg1) {
 /// \brief MainWindow::on_toolButton_3_clicked
 ///   启动
 void MainWindow::on_toolButton_3_clicked() {
-    //   启动roslaunch命令
-  // if (hardware_process_->state() != QProcess::Running) {
-  //     hardware_process_->start("roslaunch", QStringList() << "robot_control" << "robot_control.launch");
-  //     ui->label_5->setText("底盘启动...");
-  //     // 检查进程是否已经启动
-  //     if (!hardware_process_->waitForStarted(5000)) { // 等待5秒
-  //         // 如果在5秒内进程没有启动，则退出等待
-  //         ui->label_5->setText("底盘启动失败");
-  //         hardware_process_->close();
-  //         delete hardware_process_;
-  //         hardware_process_ = nullptr;
-  //         return;
-  //     }
-  // }
-
-  // if (laser_process_->state() != QProcess::Running) {
-  //     ui->label_5->setText("激光雷达启动...");
-  //     laser_process_->start("roslaunch", QStringList() << "ydlidar_ros_driver" << "lidar.launch");
-  //     // 检查进程是否已经启动
-  //     if (!laser_process_->waitForStarted(5000)) { // 等待5秒
-  //         // 如果在5秒内进程没有启动，则退出等待
-  //         ui->label_5->setText("激光雷达启动失败");
-  //         laser_process_->close();
-  //         delete laser_process_;
-  //         laser_process_ = nullptr;
-  //         return;
-  //     }
-  // }
-
 
   // // 延时1s  不然启动有问题
   // QTime t;
@@ -647,18 +686,9 @@ void MainWindow::on_toolButton_3_clicked() {
   // while(t.elapsed()<1000)//1000ms = 1s
   //       QCoreApplication::processEvents();
 
-  if (frontend_process_->state() != QProcess::Running) {
-      frontend_process_->start("roslaunch", QStringList() << "calib_fusion_2d" << "frontend.launch");
-      // 检查进程是否已经启动
-      if (!frontend_process_->waitForStarted(5000)) { // 等待5秒
-          // 如果在5秒内进程没有启动，则退出等待
-          frontend_process_->close();
-          return;
-      }
-  }
 //  frontend_process_->start("roslaunch", QStringList() << "calib_fusion_2d" << "frontend_view.launch");
   //  frontend_process_->start("roslaunch", QStringList() << "calib_fusion_2d" << "dataset_frontend_view.launch");
-//  frontend_process_->start("roslaunch", QStringList() << "calib_fusion_2d" << "dataset_frontend.launch");
+ frontend_process_->start("roslaunch", QStringList() << "calib_fusion_2d" << "dataset_frontend.launch");
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -1,0 +1,22 @@
+syntax = "proto3";
+package comm.pose.proto;
+
+message Vector2d {
+  double x = 1;
+  double y = 2;
+}
+
+message Vector2f {
+  float x = 1;
+  float y = 2;
+}
+
+message Transform2f {
+  Vector2f translation = 1;
+  float rotation = 2;
+}
+
+message Transform2d {
+  Vector2d translation = 1;
+  double rotation = 2;
+}

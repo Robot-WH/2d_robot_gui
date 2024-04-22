@@ -12,14 +12,24 @@ set(CMAKE_CXX_FLAGS_DEBUG "-O0 -Wall -g -ggdb")
 
 ## System dependencies are found with CMake's conventions
 find_package(Boost REQUIRED COMPONENTS thread signals)
-
+find_package(Protobuf REQUIRED)
 ###########
 ## Build ##
 ###########
 
 
+## Specify additional locations of header files
+## Your package locations should be listed before other locations
 add_library(client_comm_lib
     client/socket_comm.cpp
+    proto/pose.pb.cc
+    proto/obs.pb.cc
+    proto/control_cmd.pb.cc
+)
+
+target_link_libraries(client_comm_lib ${Protobuf_LIBRARIES})
+target_include_directories(client_comm_lib PUBLIC
+    ${PROTOBUF_INCLUDE_DIRS}
 )
 
 
