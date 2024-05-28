@@ -37,6 +37,7 @@ public:
     void SetLaserInverted(bool flag);
     void setRobotSize(QSize size);
     void SetGridMapShow(bool flag);
+    void SetGoal();
     void ChangeScale(bool type, const QPointF& center);
     void clearWheelPath();
     QPolygon MapPoints;
@@ -73,7 +74,8 @@ signals:
     void cursorPos(QPointF);
     void roboPos(QPointF);
     void signalPub2DPose(QPointF,QPointF);
-    void signalPub2DGoal(QPointF,QPointF);
+    // void signalPub2DGoal(QPointF,QPointF);
+    void signalPub2DGoal(double x, double y, double yaw);
 public slots:
     void paintMaps(QImage map);
     void paintSubGridMap(QImage map, QPointF mapOrigin, float res, int width, int height);
@@ -90,11 +92,11 @@ public slots:
 private:
     void drawGridMap(QPainter *painter);
     void drawRoboPos(QPainter *painter);
+    void drawNavArrow(QPainter *painter);
     void drawLaserScan(QPainter *painter);
     void drawTools(QPainter *painter);
     void drawPlannerPath(QPainter *painter);
     void drawWheelOdomPath(QPainter *painter);
-    void poseLaserOdomToOdom(QPointF& pose_in_laserOdom);
     void transformMapFromLaserOdomToOdom(QImage& map);
 private:
     struct LaserWheelExt {
@@ -108,6 +110,7 @@ private:
     bool laser_upside_down_;   // 雷达颠倒
     bool show_gridmap_flag = false;
     QPixmap robotImg;
+    QPixmap arrowImg;
     QPointF m_startPose;
     QPointF m_endPose;
     qreal m_scaleValue = 0.2;
@@ -115,6 +118,7 @@ private:
     float map_resolution_ = 0.05;    // 地图局部分辨率
     float expansion_coef_ = 0.2;     // 地图分辨率的放大系数
     std::mutex wheelPath_mt;
+    bool set_goal_ = false;
 };
 }  // namespace ros_qt5_gui_app
 #endif  // roboItem_H

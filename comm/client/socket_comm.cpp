@@ -167,6 +167,7 @@ bool SocketClient::Connect(const int& port, const std::string& ip) {
  */
 void SocketClient::Send(const uint8_t& type, const std::string& serialized_message) {
   if (fd_ < 0) return;
+  // 处理粘包的问题，加一个包头数据 
   // 获取消息信息
   MessageInfo info;
   info.message_type = type;

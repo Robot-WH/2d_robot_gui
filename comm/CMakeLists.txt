@@ -16,11 +16,11 @@ find_package(Protobuf REQUIRED)
 ###########
 ## Build ##
 ###########
-
+# message(FATAL_ERROR "${PROTOBUF_INCLUDE_DIRS}: " ${PROTOBUF_INCLUDE_DIRS})
 
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
-add_library(client_comm_lib
+add_library(client_comm_lib STATIC
     client/socket_comm.cpp
     proto/pose.pb.cc
     proto/obs.pb.cc
@@ -32,8 +32,9 @@ target_include_directories(client_comm_lib PUBLIC
     ${PROTOBUF_INCLUDE_DIRS}
 )
 
-
-  #############
-  ## INSTALL ##
-  #############
-
+#############
+## INSTALL ##
+#############
+install(TARGETS client_comm_lib
+	ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+)

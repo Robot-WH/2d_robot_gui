@@ -98,7 +98,8 @@ class QNode : public QThread {
 
  public slots:
   void pub2DPose(QPointF,QPointF);
-  void pub2DGoal(QPointF,QPointF);
+  // void pub2DGoal(QPointF,QPointF);
+  void pub2DGoal(double x, double y, double angle);
  Q_SIGNALS:
   void loggingUpdated();
   void rosShutdown();
@@ -133,7 +134,6 @@ private:
   void laserOdomPathCallback(nav_msgs::Path::ConstPtr path);
   void laserWheelCalibCallback(const calib_fusion_2d::laserWheelCalibResConstPtr& msg);
   void SubAndPubTopic();
-  void updateRobotPose();
   void sendDataToServer();
 
   int init_argc;

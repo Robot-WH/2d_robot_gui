@@ -120,9 +120,9 @@ void QNode::SubAndPubTopic() {
 //  image_transport::ImageTransport it(n);
 //  m_imageMapPub = it.advertise("image/map", 10);
 
-//  //导航目标点发送话题
-//  goal_pub = n.advertise<geometry_msgs::PoseStamped>(
-//      naviGoal_topic.toStdString(), 1000);
+ //导航目标点发送话题
+ goal_pub = n.advertise<geometry_msgs::PoseStamped>(
+     naviGoal_topic.toStdString(), 1000);
 //  //全局规划Path
 //  m_plannerPathSub =
 //      n.subscribe(path_topic, 1000, &QNode::plannerPathCallback, this);
@@ -131,8 +131,8 @@ void QNode::SubAndPubTopic() {
   laserWheelCalib_client = n.serviceClient<calib_fusion_2d::laserWheelCalib>("/laserWheelCalib");
   m_robotPoselistener = new tf::TransformListener;
   m_Laserlistener = new tf::TransformListener;
-//  movebase_client = new MoveBaseClient("move_base", true);
-//  movebase_client->waitForServer(ros::Duration(1.0));
+ movebase_client = new MoveBaseClient("move_base", true);
+ movebase_client->waitForServer(ros::Duration(1.0));
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -162,7 +162,6 @@ void QNode::run() {
   // spinner.start();
   //当当前节点没有关闭时
   while (ros::ok()) {
-    // updateRobotPose();      // 通过tf获取机器人位姿   弃用
 //    emit updateRobotStatus(RobotStatus::normal);
     sendDataToServer();
     ros::spinOnce();
@@ -280,7 +279,6 @@ void QNode::dynamicLaserPointCallback(sensor_msgs::PointCloudConstPtr laser_msg)
   }
   emit updateDynamicLaserScan(dynamicLaserPoints);
 }
-
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -495,20 +493,34 @@ void QNode::pub2DPose(QPointF start_pose,QPointF end_pose){
     goal.pose.pose.orientation =
         tf::createQuaternionMsgFromRollPitchYaw(0, 0, angle);
     m_initialposePub.publish(goal);
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
-void QNode::pub2DGoal(QPointF start_pose,QPointF end_pose){
-    start_pose =transScenePoint2Word(start_pose);
-    end_pose =transScenePoint2Word(end_pose);
-    double angle = atan2(end_pose.y()-start_pose.y(),end_pose.x()-start_pose.x());
+// void QNode::pub2DGoal(QPointF start_pose,QPointF end_pose){
+//     start_pose =transScenePoint2Word(start_pose);
+//     end_pose =transScenePoint2Word(end_pose);
+//     double angle = atan2(end_pose.y()-start_pose.y(),end_pose.x()-start_pose.x());
+//     move_base_msgs::MoveBaseGoal goal;
+//     goal.target_pose.header.frame_id = "map";
+//     goal.target_pose.header.stamp = ros::Time::now();
+
+//     goal.target_pose.pose.position.x = start_pose.x();
+//     goal.target_pose.pose.position.y = start_pose.y();
+//     goal.target_pose.pose.position.z = 0;
+//     goal.target_pose.pose.orientation =
+//         tf::createQuaternionMsgFromRollPitchYaw(0, 0, angle);
+//     movebase_client->sendGoal(goal);
+// }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+void QNode::pub2DGoal(double x, double y, double angle) {
+    std::cout << "QNode::pub2DGoal" << std::endl;
     move_base_msgs::MoveBaseGoal goal;
-    goal.target_pose.header.frame_id = "map";
+    goal.target_pose.header.frame_id = "odom";
     goal.target_pose.header.stamp = ros::Time::now();
 
-    goal.target_pose.pose.position.x = start_pose.x();
-    goal.target_pose.pose.position.y = start_pose.y();
+    goal.target_pose.pose.position.x = x;
+    goal.target_pose.pose.position.y = y;
     goal.target_pose.pose.position.z = 0;
     goal.target_pose.pose.orientation =
         tf::createQuaternionMsgFromRollPitchYaw(0, 0, angle);
@@ -556,37 +568,6 @@ void QNode::laserWheelCalibCall(uint8_t task, bool& result) {
   calib_fusion_2d::laserWheelCalibResponse res;
   laserWheelCalib_client.call(req, res);
   result = res.success;
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////
-void QNode::updateRobotPose() {
-  try {
-    tf::StampedTransform transform;
-    m_robotPoselistener->lookupTransform(map_frame, base_frame, ros::Time(0),
-                                         transform);
-    tf::Quaternion q = transform.getRotation();
-    double x = transform.getOrigin().getX();
-    double y = transform.getOrigin().getY();
-    tf::Matrix3x3 mat(q);
-    double roll, pitch, yaw;
-    mat.getRPY(roll, pitch, yaw);
-//    qDebug() << "robot x: " << x << ", y: " << y << ", yaw: " << yaw;
-//    QPointF roboPos = transWordPoint2Scene(QPointF(x, y));
-    RobotPose pos{x, y, yaw};
-    emit updateRoboPose(pos);
-  } catch (tf::TransformException& ex) {
-//    log(Error,
-//        ("robot pose tf transform: " + QString(ex.what())).toStdString());
-//    try {
-//      m_robotPoselistener->waitForTransform(map_frame, base_frame, ros::Time(0),
-//                                            ros::Duration(0.4));
-//      m_Laserlistener->waitForTransform(map_frame, laser_frame, ros::Time(0),
-//                                        ros::Duration(0.4));
-//    } catch (tf::TransformException& ex) {
-//      log(Error,
-//          ("robot pose tf transform: " + QString(ex.what())).toStdString());
-//    }
-  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////

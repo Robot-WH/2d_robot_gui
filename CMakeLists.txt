@@ -12,7 +12,6 @@ set(CMAKE_BUILD_TYPE "Release")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3 -Wall -g")
 # 将包含build目录下的头文件，qt会生成moc_中间头文件以及ui_xxx.h 头文件
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
-
 ##############################################################################
 # Catkin
 ##############################################################################
@@ -25,6 +24,7 @@ find_package(catkin REQUIRED COMPONENTS
     std_msgs
 #    image_transport   
     )
+
 
 find_package(OpenCV REQUIRED)
 
@@ -100,22 +100,17 @@ find_library(cv_bridge_LIBRARIES
   NAMES cv_bridge
   DOC "cv_bridge library")
 
-find_library(blas_LIBRARIES
-NAMES blas
-DOC "blas library")
-
-find_library(gdal_LIBRARIES
-NAMES gdal
-DOC "gdal library")
-
 add_executable(robot_gui ${QRC_FILES} ${QT_SOURCES} ${QT_RESOURCES_CPP} 
                                         ${QT_FORMS_HPP} ${QT_MOC_HPP})
+
+target_link_directories(robot_gui PUBLIC
+    ${EXTRA_LINK_DIR}
+)
+
 target_link_libraries(robot_gui 
     ${QT_LIBRARIES} 
     ${catkin_LIBRARIES} 
     ${cv_bridge_LIBRARIES}
-    ${blas_LIBRARIES}
-    ${gdal_LIBRARIES}
     ${OpenCV_LIBS}
     client_comm_lib
 )

@@ -17,7 +17,7 @@ roboItem::roboItem() {
   set2DGoalCursor = new QCursor(QPixmap("://images/cursor_pos.png"), 0, 0);
   setRobotVis(eRobotColor::red);
   setDefaultScale();
-  laser_upside_down_ = false;   // 雷达颠倒
+  arrowImg.load("://images/up.png");
   visual_mode_ = VisualMode::internal_tracking;
   param.linear_v = 0.5;
   param.angular_v = 0.175;
@@ -63,8 +63,6 @@ void roboItem::paintImage(int id, QImage image) { m_image = image; }
 void roboItem::paintStableLaserScan(QPolygonF points) {
   // 激光odom系转图元item系
   for (int i = 0; i < points.size(); ++i) {
-    // 转到odom系
-    poseLaserOdomToOdom(points[i]);
     // 转图元系
     points[i].setX(points[i].x() / map_resolution_);
     points[i].setY(-points[i].y() / map_resolution_);
@@ -81,8 +79,6 @@ void roboItem::paintStableLaserScan(QPolygonF points) {
 void roboItem::paintDynamicLaserScan(QPolygonF points) {
   // 激光odom系转图元item系
   for (int i = 0; i < points.size(); ++i) {
-    // 转到odom系
-    poseLaserOdomToOdom(points[i]);
     // 转图元系
     points[i].setX(points[i].x() / map_resolution_);
     points[i].setY(-points[i].y() / map_resolution_);
@@ -137,14 +133,8 @@ void roboItem::paintSubGridMap(QImage map, QPointF mapOrigin, float res, int wid
   if (map_resolution_ != res * expansion_coef_) {
     map_resolution_ = res * expansion_coef_;    // 可视化的分辨率 和 实际物理分辨率 差一个 expansion_coef_的倍数
   }
-  // 没有颠倒的情况下原mapOrigin是图片左下角的坐标，而Qt中显示图片的原点坐标系在图片左上角，因此要进行转换
-  // 而颠倒时候，由与y反向，所以原来的mapOrigin实际就是Qt显示的坐标原点了
-  if (!laser_upside_down_) {
-    mapOrigin.setY(mapOrigin.y() + height * res);
-  }
-  // map 是激光里程计坐标系下的，要把它转换到odom系
-  transformMapFromLaserOdomToOdom(map);
-  poseLaserOdomToOdom(mapOrigin);
+  // 原mapOrigin是图片左下角的坐标，而Qt中显示图片的原点坐标系在图片左上角，因此要进行转换
+  mapOrigin.setY(mapOrigin.y() + height * res);
   // 注意，下面这个map_resolution_分辨率不是原始slam算法里的分辨率，
   // 而是qt显示时的可视化分辨率，在上面进行了转换 
   SubGridMapOrigin.setX(mapOrigin.x() / map_resolution_);
@@ -161,38 +151,6 @@ void roboItem::paintSubGridMap(QImage map, QPointF mapOrigin, float res, int wid
   update();
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// \brief roboItem::poseLaserOdomToOdom 激光odom坐标系转odom坐标系
-///               底层算法发送过来的地图原点坐标是相对于激光odom坐标系的，而实际上
-///               我们上层应用的是odom坐标系
-/// \param mapOrigin_in_laserOdom
-///
-void roboItem::poseLaserOdomToOdom(QPointF& pose_in_laserOdom) {
-    /**
-     * @todo: 这里只考虑了颠倒，需要再加入外参
-     **/
-    if (laser_upside_down_) {
-        pose_in_laserOdom.setY(-pose_in_laserOdom.y());
-    }
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////
-void roboItem::transformMapFromLaserOdomToOdom(QImage& map) {
-  int width = map.width();
-  int layer_num = map.height() / 2;
-  /**
-   * @todo: 这里只考虑了颠倒，需要再加入外参
-   **/
-  if (laser_upside_down_) {
-    for (int row = 0; row < layer_num; ++row) {
-      for (int col = 0; col < width; ++col) {
-        QRgb pixel = map.pixel(col, row);
-        map.setPixel(col, row, map.pixel(col, map.height() - row - 1));
-        map.setPixel(col, map.height() - row - 1, pixel);
-      }
-    }
-  }
-}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 void roboItem::paintRoboPos(RobotPose pos) {
@@ -215,6 +173,9 @@ void roboItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
   //  drawPlannerPath(painter);
     drawWheelOdomPath(painter);
     drawLaserScan(painter);
+    if (set_goal_) {
+      drawNavArrow(painter);
+    }
   //  drawTools(painter);
 //      float time =(double)mstimer.nsecsElapsed()/(double)1000000;
 //      qDebug() <<"paint time= " <<time<<"ms";// 输出运行时间（ms）
@@ -295,6 +256,24 @@ void roboItem::drawRoboPos(QPainter *painter) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
+void roboItem::drawNavArrow(QPainter *painter) {
+ // qDebug() << "drawNavArrow";
+  if (m_startPose == m_endPose) return;
+  painter->setPen(QPen(QColor(255, 0, 0, 255), 1, Qt::SolidLine, Qt::RoundCap,
+                       Qt::RoundJoin));
+  painter->save();
+  painter->translate(m_startPose.x(), m_startPose.y());
+  auto direct = m_endPose - m_startPose;
+  double yaw = atan2(direct.y(), direct.x());
+  painter->rotate(rad2deg(yaw + M_PI_2));
+
+  painter->drawPixmap(QPoint(-arrowImg.width() / 2, -arrowImg.height() / 2),
+                      arrowImg);
+
+  painter->restore();
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////
 void roboItem::drawLaserScan(QPainter* painter) {
   //绘制laser
   painter->setPen(QPen(QColor(0, 255, 0, 255), 1 / expansion_coef_));
@@ -361,6 +340,12 @@ void roboItem::setDefaultScale() {
 void roboItem::SetGridMapShow(bool flag) {
   show_gridmap_flag = flag;
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+void roboItem::SetGoal() {
+  set_goal_ = true;
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 QRectF roboItem::boundingRect() const {
@@ -448,6 +433,7 @@ void roboItem::mousePressEvent(QGraphicsSceneMouseEvent *event) {
 //    qDebug() << "mousePressEvent";
   if (event->button() == Qt::LeftButton) {
     m_startPose = event->pos();  //鼠标左击时，获取当前鼠标在图片中的坐标，
+    m_endPose = m_startPose;
     // qDebug() << "Press pos x: " << m_startPose.x() << ",y: " << m_startPose.y();
     m_isMousePress = true;  //标记鼠标左键被按下
   } else if (event->button() == Qt::RightButton) {
@@ -464,12 +450,18 @@ void roboItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event) {
     this->setCursor(*m_moveCursor);  //设置自定义的鼠标样式
     m_currCursor = m_moveCursor;
   }
+  m_endPose = event->pos();
+  // qDebug() << "m_endPose x: " << m_endPose.x() << ",y: " << m_endPose.y();
   //移动图层
   if (m_isMousePress && m_currCursor == m_moveCursor) {
-    QPointF point = (event->pos() - m_startPose) * m_scaleValue;
-    moveBy(point.x(), point.y());
+    if (set_goal_) {
+      // 显示指向的箭头
+      update();
+    } else {
+      QPointF point = (m_endPose - m_startPose) * m_scaleValue;
+      moveBy(point.x(), point.y());
+    }
   }
-  m_endPose = event->pos();
 }
 
 //void roboItem::hoverMoveEvent(QGraphicsSceneHoverEvent *event)
@@ -488,9 +480,20 @@ void roboItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
       m_currCursor=m_moveCursor;
       this->setCursor(*m_currCursor);
   } else if (m_currCursor == set2DGoalCursor) {
-      emit signalPub2DGoal(m_startPose,m_endPose);
+      // emit signalPub2DGoal(m_startPose,m_endPose);
       m_currCursor=m_moveCursor;
       this->setCursor(*m_currCursor);
+  }
+  if (set_goal_) {
+    // 发布目标
+    if (m_startPose != m_endPose) {
+        double x = map_resolution_ * m_startPose.x();
+        double y = -map_resolution_ * m_startPose.y();
+        auto direct = m_endPose - m_startPose;
+        double yaw = atan2(direct.y(), direct.x());
+        emit signalPub2DGoal(x, y, yaw);
+    }
+    set_goal_ = false;
   }
   m_startPose=QPointF();
   m_endPose=QPointF();

@@ -6,6 +6,7 @@
 #include <QKeyEvent>
 #include "qnode.hpp"
 #include "roboItem.h"
+#include "qcustomGraphicsScene.hpp"
 
 namespace Ui {
 class MainWindow;
@@ -52,6 +53,9 @@ protected:
   void bringUpQtRosNode();
 
   void viewCenterFocusOnRobot();
+
+private slots:
+  void on_toolButton_2_clicked();
 
 private slots:
   void on_toolButton_7_clicked();
@@ -113,6 +117,7 @@ private:
   QProcess *recordBag_process_;
   ros_qt::QNode qt_ros_node_;
 
+  // QCustomQGraphicsScene *qgraphicsScene_ = NULL;
   QGraphicsScene *qgraphicsScene_ = NULL;
   ros_qt::roboItem *roboItem_ = NULL;
 };

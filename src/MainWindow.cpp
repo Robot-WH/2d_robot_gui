@@ -14,6 +14,7 @@
 #include "ipc/DataDispatcher.hpp"
 #include "proto/control_cmd.pb.h"
 
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 MainWindow::MainWindow(int argc, char **argv, QWidget *parent) :
     QWidget(parent), ui(new Ui::MainWindow), qt_ros_node_(argc, argv) {
@@ -109,7 +110,6 @@ void MainWindow::initUI() {
   ui->toolButton_3->setIcon(QIcon(":/images/zoom.svg"));
   ui->toolButton_3->setIconSize(QSize(60, 60));
 
-
   QImage img;
   img.load(":/images/control.png");
   QImage scaledImg = img.scaled(60, 60, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
@@ -155,6 +155,7 @@ void MainWindow::initUI() {
   ui->label_power->setPixmap(QPixmap(":/images/power.png"));
   //视图场景加载
   qgraphicsScene_ =
+      // new QCustomQGraphicsScene;  //要用QGraphicsView就必须要有QGraphicsScene搭配着用
       new QGraphicsScene;  //要用QGraphicsView就必须要有QGraphicsScene搭配着用
   qgraphicsScene_->clear();
   //创建item
@@ -276,6 +277,10 @@ void MainWindow::connection() {
         ui->image_label_0->show();
   });
 
+  connect(roboItem_, &ros_qt::roboItem::signalPub2DGoal , &qt_ros_node_,
+          &ros_qt::QNode::pub2DGoal);
+
+
   // 机器人pose -> map
   connect(&qt_ros_node_, &ros_qt::QNode::updateRoboPose, roboItem_,
           &ros_qt::roboItem::paintRoboPos);
@@ -332,9 +337,9 @@ void MainWindow::simulateKeyPress(int keyCode, Qt::KeyboardModifiers modifiers) 
 ///
 void MainWindow::serverMsgCallback(const std::pair<uint8_t, std::string>& msg) {
   // 反序列化
-  std::cout << "接收到信号" << "\n";
+  // std::cout << "接收到信号" << "\n";
   if (msg.first == 1) {
-    std::cout << "接收到控制信号" << "\n";
+    // std::cout << "接收到控制信号" << "\n";
     comm::cmd::proto::ControlCmd control_cmd_packet;
     if (control_cmd_packet.ParseFromString(msg.second)) {
       // qt_ros_node_.move_base(control_cmd_packet.cmd()[0],
@@ -385,7 +390,6 @@ void MainWindow::bringUpQtRosNode() {
   }
   QString masterUrl = "http://" + hostUrl + ":11311";
   // qDebug() << "masterUrl: " << masterUrl;
-  //
   if (!qt_ros_node_.init(masterUrl.toStdString(), hostUrl.toStdString())) {
     QPalette palette = ui->label_status->palette();  // 获取QLabel的调色板
     palette.setColor(QPalette::WindowText, Qt::red);  // 设置文字颜色为红色
@@ -679,16 +683,17 @@ void MainWindow::on_checkBox_7_stateChanged(int arg1) {
 /// \brief MainWindow::on_toolButton_3_clicked
 ///   启动
 void MainWindow::on_toolButton_3_clicked() {
+  // hardware_process_->start("roslaunch", QStringList() << "robot_control" << "robot_control.launch");
+  // laser_process_->start("roslaunch", QStringList() << "ydlidar_ros_driver" << "lidar.launch");
+  // 延时1s  不然启动有问题
+  QTime t;
+  t.start();
+  while(t.elapsed()<1000)//1000ms = 1s
+        QCoreApplication::processEvents();
 
-  // // 延时1s  不然启动有问题
-  // QTime t;
-  // t.start();
-  // while(t.elapsed()<1000)//1000ms = 1s
-  //       QCoreApplication::processEvents();
-
-//  frontend_process_->start("roslaunch", QStringList() << "calib_fusion_2d" << "frontend_view.launch");
-  //  frontend_process_->start("roslaunch", QStringList() << "calib_fusion_2d" << "dataset_frontend_view.launch");
- frontend_process_->start("roslaunch", QStringList() << "calib_fusion_2d" << "dataset_frontend.launch");
+  // frontend_process_->start("roslaunch", QStringList() << "calib_fusion_2d" << "frontend_view.launch");
+  // frontend_process_->start("roslaunch", QStringList() << "calib_fusion_2d" << "dataset_frontend_view.launch");
+  frontend_process_->start("roslaunch", QStringList() << "calib_fusion_2d" << "frontend.launch");
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -757,5 +762,10 @@ void MainWindow::on_toolButton_7_clicked() {
     hardware_process_->terminate();
     laser_process_->terminate();
   }
+}
+
+
+void MainWindow::on_toolButton_2_clicked() {
+  roboItem_->SetGoal();
 }
 
