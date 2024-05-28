@@ -111,6 +111,7 @@ private slots:
 
 private:
   Ui::MainWindow *ui;
+  QProcess *navigation_process_;
   QProcess *frontend_process_;
   QProcess *laser_process_;
   QProcess *hardware_process_;

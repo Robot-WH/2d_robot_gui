@@ -24,7 +24,7 @@ MainWindow::MainWindow(int argc, char **argv, QWidget *parent) :
   ui->msg_output->setReadOnly(true);
   // 设置最大显示文本容量为100个文本块
   ui->msg_output->document()->setMaximumBlockCount(100);
-
+  navigation_process_ = new QProcess;
   frontend_process_ = new QProcess;
   laser_process_ = new QProcess;
   hardware_process_ = new QProcess;
@@ -694,6 +694,12 @@ void MainWindow::on_toolButton_3_clicked() {
   // frontend_process_->start("roslaunch", QStringList() << "calib_fusion_2d" << "frontend_view.launch");
   // frontend_process_->start("roslaunch", QStringList() << "calib_fusion_2d" << "dataset_frontend_view.launch");
   frontend_process_->start("roslaunch", QStringList() << "calib_fusion_2d" << "frontend.launch");
+
+  QTime t2;
+  t2.start();
+  while(t2.elapsed()<1000)//1000ms = 1s
+        QCoreApplication::processEvents();
+  navigation_process_->start("roslaunch", QStringList() << "move_base" << "nav.launch");
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
