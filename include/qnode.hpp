@@ -111,7 +111,8 @@ class QNode : public QThread {
   void updateRoboPose(RobotPose pos);
   void updateMap(QImage map);
   void updateSubGridMap(QImage map, QPointF mapOrigin, float res, int width, int height);
-  void plannerPath(QPolygonF path);
+  void globalPlannerPathSignal(QPolygonF path);
+  void dwaLocalPathSignal(QPolygonF path);
   void wheelOdomPathSignals(QPolygonF path);
   void updateStableLaserScan(QPolygonF points);
   void updateDynamicLaserScan(QPolygonF points);
@@ -128,7 +129,8 @@ private:
 //  void dynamicLaserPointCallback(sensor_msgs::LaserScanConstPtr scan);
   void stableLaserPointCallback(sensor_msgs::PointCloudConstPtr laser_msg);
   void dynamicLaserPointCallback(sensor_msgs::PointCloudConstPtr laser_msg);
-  void plannerPathCallback(nav_msgs::Path::ConstPtr path);
+  void globalPlannerPathCallback(nav_msgs::Path::ConstPtr path);
+  void dwaLocalPathCallback(nav_msgs::Path::ConstPtr path);
   void wheelOdomCallback(nav_msgs::Odometry wheel_odom);
   void fusionOdomCallback(const nav_msgs::Odometry& fusion_odom);
   void laserOdomPathCallback(nav_msgs::Path::ConstPtr path);
@@ -145,7 +147,8 @@ private:
   ros::Subscriber stable_laser_point_sub_;
   ros::Subscriber dynamic_laser_point_sub_;
   ros::Subscriber battery_sub;
-  ros::Subscriber m_plannerPathSub;
+  ros::Subscriber globalPlannerPathSub;
+  ros::Subscriber dwaLocalPathSub;
   ros::Subscriber wheelOdom_sub;
   ros::Subscriber m_compressedImgSub0_;
   ros::Subscriber m_compressedImgSub1;
@@ -175,7 +178,8 @@ private:
   QString naviGoal_topic;
   std::string path_topic;
   QPolygon mapPonits;
-  QPolygonF plannerPoints;
+  QPolygonF globalPlannerPoints;
+  QPolygonF dwaLocalPathPoints;
   QPolygonF wheelOdom_path;
   QPolygonF stableLaserPoints;
   QPolygonF dynamicLaserPoints;

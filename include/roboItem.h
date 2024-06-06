@@ -41,8 +41,9 @@ public:
     void ChangeScale(bool type, const QPointF& center);
     void clearWheelPath();
     QPolygon MapPoints;
-    QPolygonF plannerPath;
+    QPolygonF DWALocalPath;
     QPolygonF wheelOdomPath;
+    QPolygonF GlobalPlanningPath;
     QPolygonF stableLaserPoints;
     QPolygonF dynamicLaserPoints;
     QPointF RoboPostion;
@@ -81,8 +82,9 @@ public slots:
     void paintSubGridMap(QImage map, QPointF mapOrigin, float res, int width, int height);
     void paintRoboPos(RobotPose pos);
     void paintImage(int, QImage);
-    void paintPlannerPath(QPolygonF);
     void paintWheelOdomPath(QPolygonF path);
+    void paintGlobalPlanningPath(QPolygonF path);
+    void paintDWALocalPath(QPolygonF);
     void paintStableLaserScan(QPolygonF);
     void paintDynamicLaserScan(QPolygonF points);
     void slot_set2DPos();
@@ -95,7 +97,7 @@ private:
     void drawNavArrow(QPainter *painter);
     void drawLaserScan(QPainter *painter);
     void drawTools(QPainter *painter);
-    void drawPlannerPath(QPainter *painter);
+    void drawPlanningPath(QPainter *painter);
     void drawWheelOdomPath(QPainter *painter);
     void transformMapFromLaserOdomToOdom(QImage& map);
 private:

@@ -6,7 +6,6 @@
 #include <QKeyEvent>
 #include "qnode.hpp"
 #include "roboItem.h"
-#include "qcustomGraphicsScene.hpp"
 
 namespace Ui {
 class MainWindow;

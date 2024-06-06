@@ -123,9 +123,12 @@ void QNode::SubAndPubTopic() {
  //导航目标点发送话题
  goal_pub = n.advertise<geometry_msgs::PoseStamped>(
      naviGoal_topic.toStdString(), 1000);
-//  //全局规划Path
-//  m_plannerPathSub =
-//      n.subscribe(path_topic, 1000, &QNode::plannerPathCallback, this);
+ //全局规划Path
+ globalPlannerPathSub =
+     n.subscribe("/move_base/GlobalPlanner/plan", 1, &QNode::globalPlannerPathCallback, this);
+ dwaLocalPathSub =
+     n.subscribe("/move_base/DWAPlannerROS/local_plan", 1, &QNode::dwaLocalPathCallback, this);
+
 //  m_initialposePub = n.advertise<geometry_msgs::PoseWithCovarianceStamped>(
 //      initPose_topic.toStdString(), 10);
   laserWheelCalib_client = n.serviceClient<calib_fusion_2d::laserWheelCalib>("/laserWheelCalib");
@@ -198,14 +201,24 @@ void QNode::sendDataToServer() {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// \brief QNode::plannerPathCallback planner的路径话题回调
 /// \param path
-void QNode::plannerPathCallback(nav_msgs::Path::ConstPtr path) {
-  plannerPoints.clear();
+void QNode::globalPlannerPathCallback(nav_msgs::Path::ConstPtr path) {
+  globalPlannerPoints.clear();
   for (int i = 0; i < (int)path->poses.size(); i++) {
-    QPointF roboPos = transWordPoint2Scene(QPointF(
-        path->poses[i].pose.position.x, path->poses[i].pose.position.y));
-    plannerPoints.append(roboPos);
+    globalPlannerPoints.append(QPointF(path->poses[i].pose.position.x, path->poses[i].pose.position.y));
   }
-  emit plannerPath(plannerPoints);
+  emit globalPlannerPathSignal(globalPlannerPoints);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// \brief QNode::dwaLocalPathCallback
+/// \param path
+///
+void QNode::dwaLocalPathCallback(nav_msgs::Path::ConstPtr path) {
+  dwaLocalPathPoints.clear();
+  for (int i = 0; i < (int)path->poses.size(); i++) {
+    dwaLocalPathPoints.append(QPointF(path->poses[i].pose.position.x, path->poses[i].pose.position.y));
+  }
+  emit dwaLocalPathSignal(dwaLocalPathPoints);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -242,13 +255,6 @@ void QNode::wheelOdomCallback(nav_msgs::Odometry wheel_odom) {
 /// \brief laserOdom 话题回调
 /// \param path
 void QNode::laserOdomPathCallback(nav_msgs::Path::ConstPtr path) {
-  // plannerPoints.clear();
-  // for (int i = 0; i < (int)path->poses.size(); i++) {
-  //   QPointF roboPos = transWordPoint2Scene(QPointF(
-  //       path->poses[i].pose.position.x, path->poses[i].pose.position.y));
-  //   plannerPoints.append(roboPos);
-  // }
-  // emit plannerPath(plannerPoints);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////

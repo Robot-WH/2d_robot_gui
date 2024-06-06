@@ -193,7 +193,7 @@ void MainWindow::initUI() {
   ui->radioButton_4->setStyleSheet(styleSheet);
   ui->radioButton_4->setChecked(true);
 
-  ui->tabWidget->setFixedWidth(300);
+  ui->tabWidget->setFixedWidth(270);
   // ui->tabWidget->setFixedHeight(400);
   // ui->groupBox_3->setFixedWidth(300);
 //  ui->groupBox_10->setFixedWidth(300);
@@ -297,14 +297,6 @@ void MainWindow::connection() {
   connect(ui->radioButton_2, &QRadioButton::toggled, [=](bool isChecked){
       if (isChecked == true) {}
   });
-  // 设置激光雷达颠倒
-  connect(ui->radioButton_3, &QRadioButton::toggled, [=](bool isChecked){
-      if (isChecked == true) {
-        roboItem_->SetLaserInverted(true);
-      } else {
-        roboItem_->SetLaserInverted(false);
-      }
-  });
   connect(ui->radioButton_4, &QRadioButton::toggled, [=](bool isChecked){
       if (isChecked == true) {
         roboItem_->SetVisualMode(ros_qt::roboItem::VisualMode::internal_tracking);
@@ -313,6 +305,12 @@ void MainWindow::connection() {
   // 接收轮速轨迹->绘制轮速轨迹
   connect(&qt_ros_node_, &ros_qt::QNode::wheelOdomPathSignals, roboItem_,
           &ros_qt::roboItem::paintWheelOdomPath);
+  // 接收全局规划轨迹->绘制轨迹
+  connect(&qt_ros_node_, &ros_qt::QNode::globalPlannerPathSignal, roboItem_,
+          &ros_qt::roboItem::paintGlobalPlanningPath);
+  // 接收dwa局部规划轨迹->绘制轨迹
+  connect(&qt_ros_node_, &ros_qt::QNode::dwaLocalPathSignal, roboItem_,
+          &ros_qt::roboItem::paintDWALocalPath);
 
   ipc::DataDispatcher::GetInstance().Subscribe("ServerMsg",
                                                                                               &MainWindow::serverMsgCallback,
@@ -716,6 +714,9 @@ void MainWindow::on_toolButton_5_clicked() {
 void MainWindow::on_toolButton_4_clicked() {
   if (frontend_process_->state() == QProcess::Running) {
       frontend_process_->terminate();
+  }
+  if (navigation_process_->state() == QProcess::Running) {
+      navigation_process_->terminate();
   }
   if (laser_process_->state() == QProcess::Running) {
       laser_process_->terminate();

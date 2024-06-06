@@ -89,16 +89,6 @@ void roboItem::paintDynamicLaserScan(QPolygonF points) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// \brief roboItem::paintPlannerPath
-///               palnner规划path绘制
-/// \param path
-///
-void roboItem::paintPlannerPath(QPolygonF path) {
-  plannerPath = path;
-  update();
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////
 void roboItem::paintWheelOdomPath(QPolygonF path) {
   // std::cout << "paintWheelOdomPath" << std::endl;
   // 转图元item系
@@ -108,6 +98,35 @@ void roboItem::paintWheelOdomPath(QPolygonF path) {
     path[i].setY(-path[i].y() / map_resolution_);
   }
   wheelOdomPath = path;
+  update();
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+void roboItem::paintGlobalPlanningPath(QPolygonF path) {
+  // std::cout << "paintWheelOdomPath" << std::endl;
+  // 转图元item系
+  for (int i = 0; i < path.size(); ++i) {
+    // 转图元系
+    path[i].setX(path[i].x() / map_resolution_);
+    path[i].setY(-path[i].y() / map_resolution_);
+  }
+  GlobalPlanningPath = path;
+  update();
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// \brief roboItem::paintPlannerPath
+///               palnner规划path绘制
+/// \param path
+///
+void roboItem::paintDWALocalPath(QPolygonF path) {
+  // 转图元item系
+  for (int i = 0; i < path.size(); ++i) {
+    // 转图元系
+    path[i].setX(path[i].x() / map_resolution_);
+    path[i].setY(-path[i].y() / map_resolution_);
+  }
+  DWALocalPath = path;
   update();
 }
 
@@ -165,13 +184,14 @@ void roboItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
                                           QWidget *widget) {
 //    QElapsedTimer mstimer;
 //    mstimer.start();
-    std::cout << "paint" << "\n";
+    // std::cout << "paint" << "\n";
     if (show_gridmap_flag) {
       drawGridMap(painter);
     }
     drawRoboPos(painter);
   //  drawPlannerPath(painter);
     drawWheelOdomPath(painter);
+    drawPlanningPath(painter);
     drawLaserScan(painter);
     if (set_goal_) {
       drawNavArrow(painter);
@@ -284,10 +304,13 @@ void roboItem::drawLaserScan(QPainter* painter) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
-void roboItem::drawPlannerPath(QPainter *painter) {
+void roboItem::drawPlanningPath(QPainter *painter) {
   //绘制planner Path
-  painter->setPen(QPen(QColor(0, 0, 0, 255), 1));
-  painter->drawPoints(plannerPath);
+  painter->setPen(QPen(QColor(255, 0, 0, 255), 5));
+  painter->drawPoints(DWALocalPath);
+
+  painter->setPen(QPen(QColor(0, 0, 255, 255), 2));
+  painter->drawPoints(GlobalPlanningPath);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
