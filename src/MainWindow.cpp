@@ -13,6 +13,7 @@
 #include "ui_MainWindow.h"    // build/my_gui下 
 #include "ipc/DataDispatcher.hpp"
 #include "proto/control_cmd.pb.h"
+#include "proto/orbit_network.pb.h"
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -251,6 +252,8 @@ void MainWindow::initUI() {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 void MainWindow::initParm() {
+  orbit_network_ptr_ = std::make_shared<Schedule::OrbitNetwork>(); 
+  roboItem_->SetOrbitNetwork(orbit_network_ptr_);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -335,7 +338,7 @@ void MainWindow::simulateKeyPress(int keyCode, Qt::KeyboardModifiers modifiers) 
 ///
 void MainWindow::serverMsgCallback(const std::pair<uint8_t, std::string>& msg) {
   // 反序列化
-  // std::cout << "接收到信号" << "\n";
+  std::cout << "接收到信号, type: " << (int)msg.first << "\n";
   if (msg.first == 1) {
     // std::cout << "接收到控制信号" << "\n";
     comm::cmd::proto::ControlCmd control_cmd_packet;
@@ -372,7 +375,30 @@ void MainWindow::serverMsgCallback(const std::pair<uint8_t, std::string>& msg) {
         simulateKeyPress(Qt::Key_0, Qt::NoModifier);
       }
     } else {
-      std::cout << "解析错误" << "\n";
+      std::cout << "解析错误，信号类型为运动控制" << "\n";
+    }
+  } if (msg.first == 2) {
+    comm::orbitNet::proto::OrbitNetwork orbitNet_packet;
+    if (orbitNet_packet.ParseFromString(msg.second)) {
+      const auto& nodes = orbitNet_packet.node(); 
+
+      for (int i = 0; i < nodes.size(); ++i ) {
+        std::vector<float> params;
+        for (const auto& param : nodes[i].link_param()) {
+          params.push_back(param);
+        }
+        std::cout << "添加node, 轨道类型：" << (int)nodes[i].link_type() << "\n";  
+        int j = i + 1;
+        if (j >= nodes.size()) {
+          j = 0; 
+        }
+        orbit_network_ptr_->AddOrbitNetNode(
+          nodes[i].state_x(), nodes[i].state_y(), nodes[i].state_yaw(),
+          nodes[j].state_x(), nodes[j].state_y(), nodes[j].state_yaw(),
+          nodes[i].link_type(), params);  
+      }
+    } else {
+      std::cout << "解析错误，信号类型为路网数据" << "\n";
     }
   }
 }
@@ -691,13 +717,13 @@ void MainWindow::on_toolButton_3_clicked() {
 
   // frontend_process_->start("roslaunch", QStringList() << "calib_fusion_2d" << "frontend_view.launch");
   // frontend_process_->start("roslaunch", QStringList() << "calib_fusion_2d" << "dataset_frontend_view.launch");
-  frontend_process_->start("roslaunch", QStringList() << "calib_fusion_2d" << "frontend.launch");
+  frontend_process_->start("roslaunch", QStringList() << "calib_fusion_2d" << "gazebo_frontend.launch");
 
   QTime t2;
   t2.start();
   while(t2.elapsed()<1000)//1000ms = 1s
         QCoreApplication::processEvents();
-  navigation_process_->start("roslaunch", QStringList() << "move_base" << "nav.launch");
+  navigation_process_->start("roslaunch", QStringList() << "move_base" << "gazebo_nav.launch");
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -771,7 +797,10 @@ void MainWindow::on_toolButton_7_clicked() {
   }
 }
 
-
+/**
+ * @brief MainWindow::on_toolButton_2_clicked
+ *   设置目标点
+ */
 void MainWindow::on_toolButton_2_clicked() {
   roboItem_->SetGoal();
 }

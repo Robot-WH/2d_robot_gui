@@ -17,7 +17,7 @@ roboItem::roboItem() {
   set2DGoalCursor = new QCursor(QPixmap("://images/cursor_pos.png"), 0, 0);
   setRobotVis(eRobotColor::red);
   setDefaultScale();
-  arrowImg.load("://images/up.png");
+  arrowImg.load("://images/right.png");
   visual_mode_ = VisualMode::internal_tracking;
   param.linear_v = 0.5;
   param.angular_v = 0.175;
@@ -27,23 +27,22 @@ roboItem::roboItem() {
 void roboItem::setRobotVis(eRobotColor color) {
   switch (color) {
     case eRobotColor::blue: {
-      robotImg.load("://images/robot_blue.png");
+      robotImg_.load("://images/robot_blue.png");
     } break;
     case eRobotColor::red: {
-      robotImg.load("://images/robot_red.png");
+      robotImg_.load("://images/robot_red.png");
     } break;
     case eRobotColor::yellow: {
-      robotImg.load("://images/robot_yellow.png");
+      robotImg_.load("://images/robot_yellow.png");
     } break;
   }
   QMatrix matrix;
   matrix.rotate(90);
-  robotImg = robotImg.transformed(matrix, Qt::SmoothTransformation);
-  robotImg = robotImg.scaled(robotImg.width() * 2, robotImg.height() * 2);
+  robotImg_ = robotImg_.transformed(matrix, Qt::SmoothTransformation);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
-void roboItem::setRobotSize(QSize size) { robotImg = robotImg.scaled(size); }
+void roboItem::setRobotSize(QSize size) { robotImg_ = robotImg_.scaled(size); }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 int roboItem::QColorToInt(const QColor &color) {
@@ -149,8 +148,11 @@ void roboItem::paintSubGridMap(QImage map, QPointF mapOrigin, float res, int wid
 //  qDebug() << "paintSubGridMap";
 //  qDebug() << "width: " << width << ",height: " << height << ", res: " << res;
 //  qDebug() << "mapOrigin x: " << mapOrigin.x() << ",y: " << mapOrigin.y();
-  if (map_resolution_ != res * expansion_coef_) {
+  static bool first = true;
+  if (first) {
     map_resolution_ = res * expansion_coef_;    // 可视化的分辨率 和 实际物理分辨率 差一个 expansion_coef_的倍数
+    robotImg_ = robotImg_.scaled(0.3 / map_resolution_, 0.3 / map_resolution_);
+    first = false;
   }
   // 原mapOrigin是图片左下角的坐标，而Qt中显示图片的原点坐标系在图片左上角，因此要进行转换
   mapOrigin.setY(mapOrigin.y() + height * res);
@@ -164,6 +166,7 @@ void roboItem::paintSubGridMap(QImage map, QPointF mapOrigin, float res, int wid
   mstimer.start();
   // map 是物理尺度分辨率下的图片，显示时要转换到显示尺度分辨率下
   // 这个函数耗时巨大，当expansion_coef_ = 0.1 时，耗时接近200ms,将造成卡顿
+  // 注意显示图片的时候最小像素单位是1，而画点的时候，可以绘制小于1的点
   m_imageMap = map.scaled(width / expansion_coef_, height / expansion_coef_);
   float time =(double)mstimer.nsecsElapsed()/(double)1000000;
   qDebug() <<"map.scaled time= " <<time<<"ms";// 输出运行时间（ms）
@@ -196,45 +199,8 @@ void roboItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
     if (set_goal_) {
       drawNavArrow(painter);
     }
-  //  drawTools(painter);
 //      float time =(double)mstimer.nsecsElapsed()/(double)1000000;
 //      qDebug() <<"paint time= " <<time<<"ms";// 输出运行时间（ms）
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////
-void roboItem::drawTools(QPainter *painter) {
-  if (m_currCursor == set2DPoseCursor || m_currCursor == set2DGoalCursor) {
-      //绘制箭头
-    if (m_startPose.x() != 0 && m_startPose.y() != 0 &&
-            m_endPose.x() != 0 && m_endPose.y() != 0) {
-        QPen pen(QColor(50, 205, 50, 255), 4, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
-        QBrush brush(QColor(50, 205, 50, 255), Qt::SolidPattern);
-
-        painter->setPen(pen);
-        painter->setBrush(brush);
-        //计算线弧度
-        double theta = atan((m_endPose.y() - m_startPose.y()) /
-                             (m_endPose.x() - m_startPose.x()));
-        //绘制直线
-        QPointF startPoint, endPoint;
-        startPoint = m_startPose;
-        endPoint =m_endPose;
-        QLineF line(startPoint, endPoint);
-        painter->drawLine(line);
-        float angle = atan2(endPoint.y()-startPoint.y(), endPoint.x()-startPoint.x()) + 3.1415926;//
-        //绘制三角形
-        QPolygonF points;
-        points.push_back(endPoint);
-        QPointF point1,point2;
-        point1.setX(endPoint.x() + 10 * cos(angle - 0.5));//求得箭头点1坐标
-        point1.setY(endPoint.y() + 10 * sin(angle - 0.5));
-        point2.setX(endPoint.x() + 10 * cos(angle + 0.5));//求得箭头点2坐标
-        point2.setY(endPoint.y() + 10 * sin(angle + 0.5));
-        points.push_back(point1);
-        points.push_back(point2);
-        painter->drawPolygon(points);
-    }
-  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -262,8 +228,8 @@ void roboItem::drawRoboPos(QPainter *painter) {
   painter->translate(RoboPostion.x(), RoboPostion.y());
   painter->rotate(rad2deg(-m_roboYaw));
   painter->drawPoint(QPoint(0, 0));
-  painter->drawPixmap(QPoint(-robotImg.width() / 2, -robotImg.height() / 2),
-                      robotImg);
+  painter->drawPixmap(QPoint(-robotImg_.width() / 2, -robotImg_.height() / 2),
+                      robotImg_);
 
   painter->restore();
   if (visual_mode_ == VisualMode::internal_tracking) {
@@ -285,7 +251,7 @@ void roboItem::drawNavArrow(QPainter *painter) {
   painter->translate(m_startPose.x(), m_startPose.y());
   auto direct = m_endPose - m_startPose;
   double yaw = atan2(direct.y(), direct.x());
-  painter->rotate(rad2deg(yaw + M_PI_2));
+  painter->rotate(rad2deg(yaw));
 
   painter->drawPixmap(QPoint(-arrowImg.width() / 2, -arrowImg.height() / 2),
                       arrowImg);
@@ -462,7 +428,6 @@ void roboItem::mousePressEvent(QGraphicsSceneMouseEvent *event) {
   } else if (event->button() == Qt::RightButton) {
     // ResetItemPos();//右击鼠标重置大小
   }
-//  update();
  }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -487,12 +452,6 @@ void roboItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event) {
   }
 }
 
-//void roboItem::hoverMoveEvent(QGraphicsSceneHoverEvent *event)
-//{
-//  qDebug() << "hoverMoveEvent";
-//  emit cursorPos(event->pos());
-//}
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 void roboItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
 //  qDebug() << "mouseReleaseEvent";
@@ -512,6 +471,8 @@ void roboItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
     if (m_startPose != m_endPose) {
         double x = map_resolution_ * m_startPose.x();
         double y = -map_resolution_ * m_startPose.y();
+        m_endPose.setY(-m_endPose.y());
+        m_startPose.setY( -m_startPose.y());
         auto direct = m_endPose - m_startPose;
         double yaw = atan2(direct.y(), direct.x());
         emit signalPub2DGoal(x, y, yaw);
@@ -526,5 +487,4 @@ void roboItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
 void roboItem::clearWheelPath() {
   wheelOdomPath.clear();
 }
-
 }  // namespace ros_qt5_gui_app

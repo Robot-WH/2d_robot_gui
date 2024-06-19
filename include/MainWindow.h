@@ -120,6 +120,7 @@ private:
   // QCustomQGraphicsScene *qgraphicsScene_ = NULL;
   QGraphicsScene *qgraphicsScene_ = NULL;
   ros_qt::roboItem *roboItem_ = NULL;
+  std::shared_ptr<Schedule::OrbitNetwork> orbit_network_ptr_;  
 };
 
 #endif // MainWindow_H

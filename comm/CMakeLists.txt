@@ -25,6 +25,7 @@ add_library(client_comm_lib STATIC
     proto/pose.pb.cc
     proto/obs.pb.cc
     proto/control_cmd.pb.cc
+    proto/orbit_network.pb.cc
 )
 
 target_link_libraries(client_comm_lib ${Protobuf_LIBRARIES})

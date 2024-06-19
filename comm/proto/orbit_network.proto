@@ -1,0 +1,14 @@
+syntax = "proto3";
+package comm.orbitNet.proto;
+
+message StateNode {
+    float state_x = 1;
+    float state_y = 2;
+    float state_yaw = 3;
+    uint32 link_type = 4;   
+    repeated float link_param = 5; 
+}
+
+message OrbitNetwork {
+    repeated StateNode node = 1;   
+}

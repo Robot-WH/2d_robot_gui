@@ -100,8 +100,14 @@ find_library(cv_bridge_LIBRARIES
   NAMES cv_bridge
   DOC "cv_bridge library")
 
-add_executable(robot_gui ${QRC_FILES} ${QT_SOURCES} ${QT_RESOURCES_CPP} 
-                                        ${QT_FORMS_HPP} ${QT_MOC_HPP})
+add_executable(robot_gui 
+${QRC_FILES} 
+${QT_SOURCES} 
+${QT_RESOURCES_CPP} 
+${QT_FORMS_HPP} 
+${QT_MOC_HPP}
+src/orbit_network.cpp
+)
 
 target_link_directories(robot_gui PUBLIC
     ${EXTRA_LINK_DIR}
