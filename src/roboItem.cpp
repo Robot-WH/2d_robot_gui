@@ -199,6 +199,8 @@ void roboItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
     if (set_goal_) {
       drawNavArrow(painter);
     }
+    // 显示路网
+    drawOrbitNetwork(painter); 
 //      float time =(double)mstimer.nsecsElapsed()/(double)1000000;
 //      qDebug() <<"paint time= " <<time<<"ms";// 输出运行时间（ms）
 }
@@ -257,6 +259,55 @@ void roboItem::drawNavArrow(QPainter *painter) {
                       arrowImg);
 
   painter->restore();
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+void roboItem::drawOrbitNetwork(QPainter *painter) {
+  // 首先绘制节点
+  for (const auto& node : orbit_network_ptr_->GetAllNode()) {
+    // 首先绘制节点
+    painter->save();
+    painter->translate(node.state_x_, node.state_y_);
+    painter->rotate(rad2deg(node.state_yaw_));
+    painter->drawPixmap(QPoint(-arrowImg.width() / 2, -arrowImg.height() / 2),
+                        arrowImg);
+    painter->restore();
+    // 绘制轨道
+    painter->save();
+    QPen pen(QColor(50, 150, 200, 255), 4, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
+    painter->setPen(pen);
+
+    painter->drawPoints(node.path_);
+    painter->restore();
+  }
+  // QPen pen(QColor(50, 150, 200, 255), 4, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
+  // painter->setPen(pen);
+
+  // for (int i = 0; i < task_.size(); ++i) {
+  //   if (task_[i].link_type_ > 0) {
+  //     int next_idx = i + 1;
+  //     if (next_idx == task_.size()) {
+  //       next_idx = 0;
+  //     }
+  //     // 直线轨道
+  //     if (task_[i].link_type_ == 1) {
+  //       painter->save();
+  //       QPointF startPoint(task_[i].state_x_, task_[i].state_y_);
+  //       QPointF endPoint(task_[next_idx].state_x_, task_[next_idx].state_y_);
+  //       QLineF line(startPoint, endPoint);
+  //       painter->drawLine(line);
+  //       painter->restore();
+  //     }
+  //   }
+  // }
+  // //绘制直线
+  // if (orbit_begin_node_idx_ >= 0) {
+  //   painter->save();
+  //   QPointF startPoint(task_[orbit_begin_node_idx_].state_x_, task_[orbit_begin_node_idx_].state_y_);
+  //   QLineF line(startPoint, m_endPose);
+  //   painter->drawLine(line);
+  //   painter->restore();
+  // }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////

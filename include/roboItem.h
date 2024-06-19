@@ -44,6 +44,7 @@ public:
         orbit_network_ptr_ = net;}
     void ChangeScale(bool type, const QPointF& center);
     void clearWheelPath();
+    void Update() {update();}
     QPolygon MapPoints;
     QPolygonF DWALocalPath;
     QPolygonF wheelOdomPath;
@@ -94,7 +95,6 @@ public slots:
     void slot_set2DPos();
     void slot_set2DGoal();
     void slot_setMoveCamera();
-
 private:
     void drawGridMap(QPainter *painter);
     void drawRoboPos(QPainter *painter);
@@ -102,6 +102,7 @@ private:
     void drawLaserScan(QPainter *painter);
     void drawPlanningPath(QPainter *painter);
     void drawWheelOdomPath(QPainter *painter);
+    void drawOrbitNetwork(QPainter *painter);
     void transformMapFromLaserOdomToOdom(QImage& map);
 private:
     struct LaserWheelExt {

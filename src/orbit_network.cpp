@@ -16,7 +16,7 @@ void OrbitNetwork::AddOrbitNetNode(float begin_x, float begin_y, float begin_yaw
         t = 1000;    // 最多分1000个点  
     }
     std::cout << "t: " << t << "\n";  
-    std::vector<QPointF> path; 
+    QPolygonF path;
     path.reserve(t);
     // 直线
     if (type == 1) {
@@ -28,16 +28,14 @@ void OrbitNetwork::AddOrbitNetNode(float begin_x, float begin_y, float begin_yaw
 }
 
 void OrbitNetwork::generateLinePath(float begin_x, float begin_y, float end_x, 
-                                                                                float end_y, int t, std::vector<QPointF>& path) {
+                                                                                float end_y, int t, QPolygonF& path) {
     float step = (float)1 / t;  
     float i = 0;    
     std::cout << "begin_x: " << begin_x << ",begin_y: " << begin_y
         << ",end_x: " << end_x << ",end_y: " << end_y << ", step: " << step << "\n";  
     while (i <= 1) {
-        float x = (1 - i) * begin_x + i * end_x;
-        float y = (1 - i) * begin_y + i * end_y;
+        path.append(QPointF((1 - i) * begin_x + i * end_x, (1 - i) * begin_y + i * end_y));
         i += step;  
-        path.emplace_back(x, y); 
     }
     return; 
 }
@@ -45,6 +43,11 @@ void OrbitNetwork::generateLinePath(float begin_x, float begin_y, float end_x,
 void OrbitNetwork::generateBezierCurvePath() {
 
 }
+
+const std::vector<OrbitNode>& OrbitNetwork::GetAllNode() {
+    return orbit_network_;  
+}
+
 }
 
 

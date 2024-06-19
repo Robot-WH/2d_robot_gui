@@ -397,6 +397,7 @@ void MainWindow::serverMsgCallback(const std::pair<uint8_t, std::string>& msg) {
           nodes[j].state_x(), nodes[j].state_y(), nodes[j].state_yaw(),
           nodes[i].link_type(), params);  
       }
+      roboItem_->Update();  
     } else {
       std::cout << "解析错误，信号类型为路网数据" << "\n";
     }
