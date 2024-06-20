@@ -1,7 +1,7 @@
 #include <iostream>
 #include "orbit_network.hpp"
-namespace Schedule {
-
+namespace schedule {
+////////////////////////////////////////////////////////////////////////////////////////////////////////
 void OrbitNetwork::AddOrbitNetNode(float begin_x, float begin_y, float begin_yaw, 
         float end_x, float end_y, float end_yaw, uint8_t type, const std::vector<float>& param) {
     // 根据两点间的距离确定路径点数
@@ -27,12 +27,13 @@ void OrbitNetwork::AddOrbitNetNode(float begin_x, float begin_y, float begin_yaw
     orbit_network_.emplace_back(begin_x, begin_y, begin_yaw, std::move(path));  
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////
 void OrbitNetwork::generateLinePath(float begin_x, float begin_y, float end_x, 
                                                                                 float end_y, int t, QPolygonF& path) {
     float step = (float)1 / t;  
     float i = 0;    
-    std::cout << "begin_x: " << begin_x << ",begin_y: " << begin_y
-        << ",end_x: " << end_x << ",end_y: " << end_y << ", step: " << step << "\n";  
+    // std::cout << "begin_x: " << begin_x << ",begin_y: " << begin_y
+    //     << ",end_x: " << end_x << ",end_y: " << end_y << ", step: " << step << "\n";  
     while (i <= 1) {
         path.append(QPointF((1 - i) * begin_x + i * end_x, (1 - i) * begin_y + i * end_y));
         i += step;  
@@ -40,10 +41,12 @@ void OrbitNetwork::generateLinePath(float begin_x, float begin_y, float end_x,
     return; 
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////
 void OrbitNetwork::generateBezierCurvePath() {
 
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////
 const std::vector<OrbitNode>& OrbitNetwork::GetAllNode() {
     return orbit_network_;  
 }

@@ -52,7 +52,7 @@ public:
      * @details: 此时SingleParamFunction 参数能为 const _DataT&和_DataT和_DataT&
      */    
     void Call(_DataT& data) {
-        // std::cout << "Call(_DataT& data)" << std::endl;
+        std::cout << "Call(_DataT& data)" << std::endl;
         if (p_callback_wrapper_->get_ref_type() == ref_type::non_ref) {
             // 若回调函数参数是非引用，那么回调只能是值传递   
             SingleParamFunction<void(_DataT)>* p_callback =  
@@ -79,7 +79,7 @@ public:
      * @details: 此时SingleParamFunction 参数只能为 const _DataT&和_DataT
      */    
     void Call(const _DataT& data) {
-        // std::cout << "Call(const _DataT& data )" << std::endl;
+        std::cout << "Call(const _DataT& data )" << std::endl;
         if (p_callback_wrapper_->get_ref_type() == ref_type::non_ref) {
             // 若回调函数参数是非引用，那么回调只能是值传递   
             SingleParamFunction<void(_DataT)>* p_callback =  
@@ -98,7 +98,7 @@ public:
      * @details: 此时SingleParamFunction 参数能为 const _DataT&和_DataT和_DataT&&
      */    
     void Call(_DataT&& data) {
-        // std::cout << "Call(_DataT&& data )" << std::endl;
+        std::cout << "Call(_DataT&& data )" << std::endl;
         if (p_callback_wrapper_->get_ref_type() == ref_type::rvalue_ref) {
             // 若回调函数参数是右值引用
             SingleParamFunction<void(_DataT&&)>* p_callback =  
@@ -250,13 +250,13 @@ private:
             std::cerr<<"DataDispatcher addData() Type error !!!"<<std::endl;
             throw std::bad_cast();  
         }
-
         using pure_type = typename std::remove_const<std::remove_reference_t<_DataT>>::type; 
         DataManagerImpl<pure_type>* data_manager_ptr =  
             dynamic_cast<DataManagerImpl<pure_type>*>(data_cache_);
 
         if (high_priority_) {
-            data_manager_ptr->Call(std::forward<_DataT>(data));  // 高优先级的直接调用 
+            // 高优先级的直接调用    多线程并发时，可能多个线程同时进入回调函数，那么需要用户在回调函数里自己进行加锁处理
+            data_manager_ptr->Call(std::forward<_DataT>(data));
         } else {
             data_manager_ptr->AddData(std::forward<_DataT>(data));     // 线程安全的
         }
@@ -348,14 +348,17 @@ public:
     void Publish(std::string const& name, _T&& data) {
         // 如果有订阅者  则将数据传送到各个订阅者
         std::shared_lock<std::shared_mutex> m_l(substriber_container_m_);  // 禁止subscriber_container_ 写数据
+        // std::cout << "Publish, name: " << name << ", size: " << subscriber_container_[name].size() << "\n";
         if (subscriber_container_[name].size()) {
+            // std::cout << "11111" << "\n";
             ///////////////////////////////////////////////////
             // 遍历该topic的所有订阅者，并将数据发送给他们
-            data_m_.lock();  
+            // std::cout << "222222" << "\n";
             for (const auto& pt : subscriber_container_[name]) {
+                std::cout << "pt->addData" << "\n";
                 pt->addData(std::forward<_T>(data));     // addData是线程安全的
             }
-            data_m_.unlock();
+            // std::cout << "333333" << "\n";
             ///////////////////////////////////////////////////
             m_l.unlock();     // = unlock_shared(), 可以对 subscriber_container_ 进行更新了
             ///////////////////////////////////////////////////
@@ -369,6 +372,7 @@ public:
             // std::cout << "active_data_container_ name: " << name << "=true" << std::endl;
             con_.notify_one();  
         }
+        // std::cout << "3333333" << "\n";
         return;
     }
 

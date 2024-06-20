@@ -40,7 +40,7 @@ public:
     void setRobotSize(QSize size);
     void SetGridMapShow(bool flag);
     void SetGoal();
-    void SetOrbitNetwork(const std::shared_ptr<Schedule::OrbitNetwork>& net) {
+    void SetOrbitNetwork(const std::shared_ptr<schedule::OrbitNetwork>& net) {
         orbit_network_ptr_ = net;}
     void ChangeScale(bool type, const QPointF& center);
     void clearWheelPath();
@@ -121,11 +121,11 @@ private:
     QPointF m_endPose;
     qreal m_scaleValue = 0.2;
     qreal m_scaleMin = 0.01;
-    float map_resolution_ = 0.05;    // 地图局部分辨率
+    float map_resolution_ = 1;    // 地图局部分辨率
     float expansion_coef_ = 0.2;     // 地图分辨率的放大系数
     std::mutex wheelPath_mt;
     bool set_goal_ = false;
-    std::shared_ptr<Schedule::OrbitNetwork> orbit_network_ptr_;  
+    std::shared_ptr<schedule::OrbitNetwork> orbit_network_ptr_;  
 };
 }  // namespace ros_qt5_gui_app
 #endif  // roboItem_H

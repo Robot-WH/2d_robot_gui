@@ -194,16 +194,6 @@ void MainWindow::initUI() {
   ui->radioButton_4->setStyleSheet(styleSheet);
   ui->radioButton_4->setChecked(true);
 
-  ui->tabWidget->setFixedWidth(270);
-  // ui->tabWidget->setFixedHeight(400);
-  // ui->groupBox_3->setFixedWidth(300);
-//  ui->groupBox_10->setFixedWidth(300);
-//  ui->groupBox_6->setFixedHeight(250);
-  // 放大缩小设置
-//  ui->groupBox_5->setFixedWidth(40);
-////  ui->groupBox_5->setStyleSheet("QGroupBox { padding: 2px; }");
-//  ui->groupBox_5->setStyleSheet("QGroupBox { border: none; }");
-
   ui->server_connect_Button->setFixedHeight(60);
   ui->server_connect_Button->setFixedWidth(60);
 //  // 退出
@@ -213,6 +203,16 @@ void MainWindow::initUI() {
   ui->groupBox_4->setHidden(1);
   ui->groupBox_6->setFixedHeight(100);
   ui->groupBox_7->setFixedHeight(100);
+
+  ui->groupBox_3->setFixedWidth(300);
+  ui->groupBox_8->setFixedWidth(300);
+  ui->groupBox_2->setFixedWidth(300);
+
+  // ui->groupBox_3->setStyleSheet("QGroupBox { border: 0 px solid gray; padding: 1px; }");
+  // ui->groupBox_8->setStyleSheet("QGroupBox { border: 0 px solid gray; padding: 1px; }");
+  // ui->groupBox_2->setStyleSheet("QGroupBox { border: 0 px solid gray; padding: 1px; }");
+  ui->groupBox_8->setHidden(1);
+  ui->groupBox_2->setHidden(1);
 
   ui->label_43->setText(QString::number(roboItem_->param.linear_v));
   ui->label_45->setText(QString::number(roboItem_->param.angular_v));
@@ -233,17 +233,6 @@ void MainWindow::initUI() {
   palette.setColor(QPalette::WindowText, Qt::red); // 设置文本颜色为红色
   ui->label_35->setPalette(palette);
 
-  // 传感器状态
-  palette = ui->label_laser_state->palette();
-  palette.setColor(QPalette::WindowText, Qt::green);
-  ui->label_laser_state->setPalette(palette);
-  palette = ui->label_wheel_state->palette();
-  palette.setColor(QPalette::WindowText, Qt::green);
-  ui->label_wheel_state->setPalette(palette);
-  palette = ui->label_imu_state->palette();
-  palette.setColor(QPalette::WindowText, Qt::green);
-  ui->label_imu_state->setPalette(palette);
-
   palette = ui->label_6->palette();  // 获取QLabel的调色板
   palette.setColor(QPalette::WindowText, Qt::red);  // 设置文字颜色为红色
   ui->label_6->setPalette(palette);  // 应用新的调色板
@@ -252,8 +241,10 @@ void MainWindow::initUI() {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 void MainWindow::initParm() {
-  orbit_network_ptr_ = std::make_shared<Schedule::OrbitNetwork>(); 
+  orbit_network_ptr_ = std::make_shared<schedule::OrbitNetwork>(); 
   roboItem_->SetOrbitNetwork(orbit_network_ptr_);
+  scheduler_ptr_ = std::make_shared<schedule::Scheduler>(); 
+  scheduler_ptr_->SetOrbitNetwork(orbit_network_ptr_); 
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -320,6 +311,11 @@ void MainWindow::connection() {
                                                                                               this,
                                                                                               1000,
                                                                                               true);
+  ipc::DataDispatcher::GetInstance().Subscribe("TaskPathMsg",
+                                                                                              &ros_qt::QNode::TaskPathCallback,
+                                                                                              &qt_ros_node_,
+                                                                                              10,
+                                                                                              true);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -380,6 +376,7 @@ void MainWindow::serverMsgCallback(const std::pair<uint8_t, std::string>& msg) {
   } if (msg.first == 2) {
     comm::orbitNet::proto::OrbitNetwork orbitNet_packet;
     if (orbitNet_packet.ParseFromString(msg.second)) {
+      orbit_network_ptr_->Clear(); 
       const auto& nodes = orbitNet_packet.node(); 
 
       for (int i = 0; i < nodes.size(); ++i ) {
@@ -398,6 +395,8 @@ void MainWindow::serverMsgCallback(const std::pair<uint8_t, std::string>& msg) {
           nodes[i].link_type(), params);  
       }
       roboItem_->Update();  
+      // 给调度模块
+      scheduler_ptr_->Run();
     } else {
       std::cout << "解析错误，信号类型为路网数据" << "\n";
     }
@@ -804,5 +803,26 @@ void MainWindow::on_toolButton_7_clicked() {
  */
 void MainWindow::on_toolButton_2_clicked() {
   roboItem_->SetGoal();
+}
+
+
+void MainWindow::on_toolButton_10_clicked() {
+  ui->groupBox_3->setHidden(1);
+  ui->groupBox_2->setHidden(1);
+  ui->groupBox_8->setHidden(0);
+}
+
+
+void MainWindow::on_toolButton_9_clicked() {
+  ui->groupBox_2->setHidden(1);
+  ui->groupBox_8->setHidden(1);
+  ui->groupBox_3->setHidden(0);
+}
+
+
+void MainWindow::on_toolButton_11_clicked() {
+  ui->groupBox_3->setHidden(1);
+  ui->groupBox_8->setHidden(1);
+  ui->groupBox_2->setHidden(0);
 }
 

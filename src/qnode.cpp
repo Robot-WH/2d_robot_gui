@@ -733,4 +733,9 @@ void QNode::log(const LogLevel& level, const std::string& msg) {
   Q_EMIT loggingUpdated();  // used to readjust the scrollbar
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+void QNode::TaskPathCallback(const schedule::OrbitNode& node) {
+  std::cout << "接收到Task path, node, node path size: " << node.path_.size() << "\n";
+}
+
 }  // namespace ros_qt5_gui_app

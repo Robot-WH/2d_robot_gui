@@ -58,6 +58,7 @@
 #include "ui_MainWindow.h"    // build/my_gui下
 #include "client/socket_comm.hpp"
 #include "RobotAlgorithm.h"
+#include "orbit_network.hpp"
 
 typedef actionlib::SimpleActionClient<move_base_msgs::MoveBaseAction>
     MoveBaseClient;
@@ -87,6 +88,8 @@ class QNode : public QThread {
   int mapWidth{0};
   int mapHeight{0};
   void run();             // 线程执行函数    继承自QThread
+  // ipc的回调
+  void TaskPathCallback(const schedule::OrbitNode& node);
 
   /*********************
   ** Logging

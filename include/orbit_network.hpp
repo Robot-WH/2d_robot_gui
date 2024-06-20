@@ -2,7 +2,7 @@
 #include <vector>
 #include <QPointF>
 #include <QPolygonF>
-namespace Schedule {
+namespace schedule {
 struct OrbitNode {
     OrbitNode() = default; // 使用= default来让编译器生成默认构造函数
     OrbitNode(float state_x, float state_y, float state_yaw, QPolygonF&& path)
@@ -22,6 +22,9 @@ public:
     void AddOrbitNetNode(float begin_x, float begin_y, float begin_yaw, 
         float end_x, float end_y, float end_yaw, uint8_t type, const std::vector<float>& param);
     const std::vector<OrbitNode>& GetAllNode();  
+    const OrbitNode& ReadNode(int i) {return orbit_network_[i];}
+    void Clear() {orbit_network_.clear();}
+    int GetNodeSize() {return orbit_network_.size();}
 protected:
     /**
      * @brief 生成直线路径  

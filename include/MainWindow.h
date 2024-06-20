@@ -6,6 +6,7 @@
 #include <QKeyEvent>
 #include "qnode.hpp"
 #include "roboItem.h"
+#include "scheduler.hpp"
 
 namespace Ui {
 class MainWindow;
@@ -52,6 +53,15 @@ protected:
   void bringUpQtRosNode();
 
   void viewCenterFocusOnRobot();
+
+private slots:
+  void on_toolButton_11_clicked();
+
+private slots:
+  void on_toolButton_9_clicked();
+
+private slots:
+  void on_toolButton_10_clicked();
 
 private slots:
   void on_toolButton_2_clicked();
@@ -120,7 +130,8 @@ private:
   // QCustomQGraphicsScene *qgraphicsScene_ = NULL;
   QGraphicsScene *qgraphicsScene_ = NULL;
   ros_qt::roboItem *roboItem_ = NULL;
-  std::shared_ptr<Schedule::OrbitNetwork> orbit_network_ptr_;  
+  std::shared_ptr<schedule::OrbitNetwork> orbit_network_ptr_;  
+  std::shared_ptr<schedule::Scheduler> scheduler_ptr_;  
 };
 
 #endif // MainWindow_H

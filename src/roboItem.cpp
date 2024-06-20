@@ -267,8 +267,8 @@ void roboItem::drawOrbitNetwork(QPainter *painter) {
   for (const auto& node : orbit_network_ptr_->GetAllNode()) {
     // 首先绘制节点
     painter->save();
-    painter->translate(node.state_x_, node.state_y_);
-    painter->rotate(rad2deg(node.state_yaw_));
+    painter->translate(node.state_x_ / map_resolution_, -node.state_y_ / map_resolution_);
+    painter->rotate(rad2deg(-node.state_yaw_));
     painter->drawPixmap(QPoint(-arrowImg.width() / 2, -arrowImg.height() / 2),
                         arrowImg);
     painter->restore();
@@ -276,8 +276,14 @@ void roboItem::drawOrbitNetwork(QPainter *painter) {
     painter->save();
     QPen pen(QColor(50, 150, 200, 255), 4, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
     painter->setPen(pen);
+    
+    QPolygonF points; 
+    for (int i = 0; i < node.path_.size(); ++i) {
+      // 转图元系
+      points.append(QPointF(node.path_[i].x() / map_resolution_, -node.path_[i].y() / map_resolution_)); 
+    }
 
-    painter->drawPoints(node.path_);
+    painter->drawPoints(points);
     painter->restore();
   }
   // QPen pen(QColor(50, 150, 200, 255), 4, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
