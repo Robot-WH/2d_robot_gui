@@ -274,7 +274,6 @@ void MainWindow::connection() {
   connect(roboItem_, &ros_qt::roboItem::signalPub2DGoal , &qt_ros_node_,
           &ros_qt::QNode::pub2DGoal);
 
-
   // 机器人pose -> map
   connect(&qt_ros_node_, &ros_qt::QNode::updateRoboPose, roboItem_,
           &ros_qt::roboItem::paintRoboPos);
@@ -316,6 +315,11 @@ void MainWindow::connection() {
                                                                                               &qt_ros_node_,
                                                                                               10,
                                                                                               true);
+  ipc::DataDispatcher::GetInstance().Subscribe("PlanDone",
+                                                                                            &MainWindow::planDoneCallback,
+                                                                                            this,
+                                                                                            10,
+                                                                                            true);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -401,6 +405,15 @@ void MainWindow::serverMsgCallback(const std::pair<uint8_t, std::string>& msg) {
       std::cout << "解析错误，信号类型为路网数据" << "\n";
     }
   }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+void MainWindow::planDoneCallback(const uint8_t& msg) {
+  std::cout << "planDoneCallback ---" << "\n"; 
+  if (msg == 1) {
+    scheduler_ptr_->Run();
+  }
+  return; 
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////

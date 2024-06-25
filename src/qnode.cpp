@@ -6,10 +6,6 @@
 /*****************************************************************************
 ** Includes
 *****************************************************************************/
-#include "qnode.hpp"
-#include "srv/laserWheelCalib.h"
-#include "proto/obs.pb.h"
-
 #include <ros/network.h>
 #include <ros/ros.h>
 #include <std_msgs/String.h>
@@ -18,6 +14,10 @@
 #include <QMessageBox>
 #include <sstream>
 #include <string>
+#include "qnode.hpp"
+#include "srv/laserWheelCalib.h"
+#include "proto/obs.pb.h"
+#include "ipc/DataDispatcher.hpp"
 namespace ros_qt {
 /*****************************************************************************
 ** Implementation
@@ -111,11 +111,13 @@ void QNode::SubAndPubTopic() {
                                      &QNode::imageCallback0, this);
   laserWheelCalibResSub = n.subscribe("laserWheelCalibRes", 10,
                                       &QNode::laserWheelCalibCallback, this);
-
+  plan_done_sub_ = n.subscribe("plan_done", 10,
+                                      &QNode::planDoneCallback, this);
   // 速度控制话题
-   cmd_pub = n.advertise<geometry_msgs::Twist>("cmd_vel", 10);
+  cmd_pub = n.advertise<geometry_msgs::Twist>("cmd_vel", 10);
   // 重置设置话题
   reset_pub = n.advertise<std_msgs::Bool>("cmd_reset", 1);
+  task_path_pub = n.advertise<nav_msgs::Path>("task_path", 1);
 
 //  image_transport::ImageTransport it(n);
 //  m_imageMapPub = it.advertise("image/map", 10);
@@ -734,8 +736,42 @@ void QNode::log(const LogLevel& level, const std::string& msg) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
-void QNode::TaskPathCallback(const schedule::OrbitNode& node) {
-  std::cout << "接收到Task path, node, node path size: " << node.path_.size() << "\n";
+void QNode::TaskPathCallback(const std::pair<schedule::OrbitNode, float>& data) {
+  std::cout << "接收到Task path" << "\n";
+  // task_path_pub
+  // 创建一个nav_msgs/Path消息  
+  nav_msgs::Path path_msg;  
+  path_msg.header.frame_id = "odom"; // 或其他适当的帧ID  
+  path_msg.header.stamp = ros::Time::now();  
+
+  // 遍历QPolygonF并填充nav_msgs/Path  
+  for (int i = 0; i < data.first.path_.size(); ++i) {  
+      geometry_msgs::PoseStamped pose_stamped;  
+      pose_stamped.header.frame_id = "odom";  
+      pose_stamped.header.stamp = ros::Time::now();  
+
+      pose_stamped.pose.position.x = data.first.path_[i].x();  
+      pose_stamped.pose.position.y = data.first.path_[i].y();  
+      // 假设我们不需要z轴位置和姿态（roll, pitch, yaw）  
+      pose_stamped.pose.position.z = 0.0;  
+      pose_stamped.pose.orientation.w = 1.0; // 四元数表示，这里只设置w为1，表示没有旋转  
+      path_msg.poses.push_back(pose_stamped);  
+  }  
+  // 给最后一个Pose附上姿态信息
+  auto& pose_stamped = path_msg.poses.back();
+  double cy = cos(data.second / 2.0);  
+  double sy = sin(data.second / 2.0);  
+  pose_stamped.pose.orientation.x = 0.0;  
+  pose_stamped.pose.orientation.y = 0.0;  
+  pose_stamped.pose.orientation.z = sy;  
+  pose_stamped.pose.orientation.w = cy;  
+  // 发布nav_msgs/Path  
+  task_path_pub.publish(path_msg);  
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+void QNode::planDoneCallback(const std_msgs::UInt8& msg) {
+  ipc::DataDispatcher::GetInstance().Publish("PlanDone", msg.data );
 }
 
 }  // namespace ros_qt5_gui_app

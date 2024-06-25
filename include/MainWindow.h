@@ -29,6 +29,7 @@ protected:
    */
   QString getLocalIpAddress();
   void serverMsgCallback(const std::pair<uint8_t, std::string>& msg);
+  void planDoneCallback(const uint8_t& msg);
   void keyPressEvent(QKeyEvent* event) override;
   void simulateKeyPress(int keyCode, Qt::KeyboardModifiers modifiers);
 

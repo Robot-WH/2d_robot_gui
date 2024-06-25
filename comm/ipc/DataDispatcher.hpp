@@ -52,7 +52,7 @@ public:
      * @details: 此时SingleParamFunction 参数能为 const _DataT&和_DataT和_DataT&
      */    
     void Call(_DataT& data) {
-        std::cout << "Call(_DataT& data)" << std::endl;
+        // std::cout << "Call(_DataT& data)" << std::endl;
         if (p_callback_wrapper_->get_ref_type() == ref_type::non_ref) {
             // 若回调函数参数是非引用，那么回调只能是值传递   
             SingleParamFunction<void(_DataT)>* p_callback =  
@@ -79,7 +79,7 @@ public:
      * @details: 此时SingleParamFunction 参数只能为 const _DataT&和_DataT
      */    
     void Call(const _DataT& data) {
-        std::cout << "Call(const _DataT& data )" << std::endl;
+        // std::cout << "Call(const _DataT& data )" << std::endl;
         if (p_callback_wrapper_->get_ref_type() == ref_type::non_ref) {
             // 若回调函数参数是非引用，那么回调只能是值传递   
             SingleParamFunction<void(_DataT)>* p_callback =  
@@ -98,7 +98,7 @@ public:
      * @details: 此时SingleParamFunction 参数能为 const _DataT&和_DataT和_DataT&&
      */    
     void Call(_DataT&& data) {
-        std::cout << "Call(_DataT&& data )" << std::endl;
+        // std::cout << "Call(_DataT&& data )" << std::endl;
         if (p_callback_wrapper_->get_ref_type() == ref_type::rvalue_ref) {
             // 若回调函数参数是右值引用
             SingleParamFunction<void(_DataT&&)>* p_callback =  
@@ -355,7 +355,6 @@ public:
             // 遍历该topic的所有订阅者，并将数据发送给他们
             // std::cout << "222222" << "\n";
             for (const auto& pt : subscriber_container_[name]) {
-                std::cout << "pt->addData" << "\n";
                 pt->addData(std::forward<_T>(data));     // addData是线程安全的
             }
             // std::cout << "333333" << "\n";

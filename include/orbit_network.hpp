@@ -19,11 +19,42 @@ struct OrbitNode {
 class OrbitNetwork {
 public:
     OrbitNetwork() = default;
+    /**
+     * @brief AddOrbitNetNode
+     * @param begin_x
+     * @param begin_y
+     * @param begin_yaw
+     * @param end_x
+     * @param end_y
+     * @param end_yaw
+     * @param type
+     * @param param
+     */
     void AddOrbitNetNode(float begin_x, float begin_y, float begin_yaw, 
         float end_x, float end_y, float end_yaw, uint8_t type, const std::vector<float>& param);
+
+    /**
+     * @brief GetAllNode
+     * @return
+     */
     const std::vector<OrbitNode>& GetAllNode();  
+
+    /**
+     * @brief ReadNode
+     * @param i
+     * @return
+     */
     const OrbitNode& ReadNode(int i) {return orbit_network_[i];}
+
+    /**
+     * @brief Clear
+     */
     void Clear() {orbit_network_.clear();}
+
+    /**
+     * @brief GetNodeSize
+     * @return
+     */
     int GetNodeSize() {return orbit_network_.size();}
 protected:
     /**
@@ -38,7 +69,19 @@ protected:
      */
     void generateLinePath(float begin_x, float begin_y, float end_x, 
                                                     float end_y, int t, QPolygonF& path);
-    void generateBezierCurvePath();
+
+    /**
+     * @brief generateBezierCurvePath
+     * @param begin_x
+     * @param begin_y
+     * @param end_x
+     * @param end_y
+     * @param control_points
+     * @param n
+     * @param path
+     */
+    void generateBezierCurvePath(float begin_x, float begin_y, float end_x,
+              float end_y, const std::vector<float>& control_points, int n, QPolygonF& path);
 private:
     std::vector<OrbitNode> orbit_network_;
 }; 

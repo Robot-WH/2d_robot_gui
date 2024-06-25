@@ -36,7 +36,7 @@
 #include <sensor_msgs/LaserScan.h>
 #include <sensor_msgs/PointCloud2.h>
 #include <sensor_msgs/image_encodings.h>  //图像编码格式
-
+#include <std_msgs/UInt8.h>  
 #include <std_msgs/Float32.h>
 #include <std_msgs/Float64.h>
 #include <std_msgs/Bool.h>
@@ -89,7 +89,7 @@ class QNode : public QThread {
   int mapHeight{0};
   void run();             // 线程执行函数    继承自QThread
   // ipc的回调
-  void TaskPathCallback(const schedule::OrbitNode& node);
+  void TaskPathCallback(const std::pair<schedule::OrbitNode, float>& data);
 
   /*********************
   ** Logging
@@ -138,6 +138,7 @@ private:
   void fusionOdomCallback(const nav_msgs::Odometry& fusion_odom);
   void laserOdomPathCallback(nav_msgs::Path::ConstPtr path);
   void laserWheelCalibCallback(const calib_fusion_2d::laserWheelCalibResConstPtr& msg);
+  void planDoneCallback(const std_msgs::UInt8& msg);
   void SubAndPubTopic();
   void sendDataToServer();
 
@@ -156,9 +157,11 @@ private:
   ros::Subscriber m_compressedImgSub0_;
   ros::Subscriber m_compressedImgSub1;
   ros::Subscriber laserWheelCalibResSub;
+  ros::Subscriber plan_done_sub_; 
   ros::Publisher goal_pub;
   ros::Publisher cmd_pub;
   ros::Publisher reset_pub;
+  ros::Publisher task_path_pub;
   ros::Publisher m_initialposePub;
   ros::ServiceClient laserWheelCalib_client;
 //  image_transport::Publisher m_imageMapPub;
