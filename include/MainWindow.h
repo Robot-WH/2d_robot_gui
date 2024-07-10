@@ -71,7 +71,7 @@ private slots:
   void on_toolButton_7_clicked();
 
 private slots:
-  void on_toolButton_4_clicked();
+  void on_toolButton_8_clicked();
 
 private slots:
   void on_toolButton_5_clicked();

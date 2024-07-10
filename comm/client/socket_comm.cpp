@@ -72,9 +72,9 @@ void SocketClient::Send(const uint8_t& type, const std::string& serialized_messa
   info.message_type = type;
   info.message_len = serialized_message.size();
   // 发送长度信息
-  send(fd_, &info, sizeof(info), 0);
+  send(fd_, &info, sizeof(info), MSG_DONTWAIT);
   // 发送序列化数据主体
-  send(fd_, serialized_message.data(), serialized_message.size(), 0);
+  send(fd_, serialized_message.data(), serialized_message.size(), MSG_DONTWAIT);
 }
 
 /**

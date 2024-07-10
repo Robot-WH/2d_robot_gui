@@ -78,7 +78,6 @@ void OrbitNetwork::generateBezierCurvePath(float begin_x, float begin_y, float e
 const std::vector<OrbitNode>& OrbitNetwork::GetAllNode() {
     return orbit_network_;  
 }
-
 }
 
 

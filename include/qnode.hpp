@@ -74,6 +74,7 @@ class QNode : public QThread {
   void move_base(char k, float speed_linear, float speed_trun);
   void set_goal(QString frame, double x, double y, double z, double w);
   void SetReset();
+  void TaskStop(const bool& flag);
   void SetGridMapShowFlag(bool flag);
   void setMainWindowUi(Ui::MainWindow *ui);
   void SetWheelOdomSubscribe(bool flag);
@@ -161,6 +162,7 @@ private:
   ros::Publisher goal_pub;
   ros::Publisher cmd_pub;
   ros::Publisher reset_pub;
+  ros::Publisher task_stop_pub;
   ros::Publisher task_path_pub;
   ros::Publisher m_initialposePub;
   ros::ServiceClient laserWheelCalib_client;
@@ -201,7 +203,7 @@ private:
   //地图是否被初始化
   bool m_bMapIsInit = false;
   // gird map是否显示
-  bool gridmap_show_flag = false;
+  bool gridmap_show_flag = true;
   bool ready_pose_ = false, ready_stable_laser_point_ = false;
   // tf::TransformListener m_tfListener(ros::Duration(10));
   // ros::Timer m_rosTimer;

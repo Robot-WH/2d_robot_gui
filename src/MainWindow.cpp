@@ -15,7 +15,6 @@
 #include "proto/control_cmd.pb.h"
 #include "proto/orbit_network.pb.h"
 
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 MainWindow::MainWindow(int argc, char **argv, QWidget *parent) :
     QWidget(parent), ui(new Ui::MainWindow), qt_ros_node_(argc, argv) {
@@ -121,25 +120,14 @@ void MainWindow::initUI() {
   ui->toolButton_3->setText("运行");
   ui->toolButton_3->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
 
-  ui->toolButton_4->setIcon(QIcon(":/images/forbidden.svg"));
-  ui->toolButton_4->setIconSize(QSize(60, 60));
-  ui->toolButton_4->setFixedHeight(100);
-  ui->toolButton_4->setFixedWidth(100);
-  ui->toolButton_4->setText("停止");
-  ui->toolButton_4->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
-
-  img.load(":/images/return.png");
-  scaledImg = img.scaled(60, 60, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
-  ui->toolButton_5->setIcon(QPixmap::fromImage(scaledImg));
+  ui->toolButton_5->setIcon(QIcon(":/images/rotate.svg"));
   ui->toolButton_5->setIconSize(QPixmap::fromImage(scaledImg).size());
   ui->toolButton_5->setFixedHeight(100);
   ui->toolButton_5->setFixedWidth(100);
   ui->toolButton_5->setText("重置");
   ui->toolButton_5->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
 
-  img.load(":/images/default_package_icon.png");
-  scaledImg = img.scaled(60, 60, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
-  ui->toolButton_6->setIcon(QPixmap::fromImage(scaledImg));
+  ui->toolButton_6->setIcon(QIcon(":/images/save.svg"));
   ui->toolButton_6->setIconSize(QPixmap::fromImage(scaledImg).size());
   ui->toolButton_6->setFixedHeight(100);
   ui->toolButton_6->setFixedWidth(100);
@@ -152,6 +140,36 @@ void MainWindow::initUI() {
   ui->toolButton_7->setFixedWidth(100);
   ui->toolButton_7->setText("录制");
   ui->toolButton_7->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+
+  ui->toolButton_8->setIcon(QIcon(":/images/forbidden.svg"));
+  ui->toolButton_8->setIconSize(QSize(60, 60));
+  ui->toolButton_8->setFixedHeight(100);
+  ui->toolButton_8->setFixedWidth(100);
+  ui->toolButton_8->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+
+  ui->toolButton_9->setIcon(QIcon(":/images/focus.svg"));
+  ui->toolButton_9->setIconSize(QSize(60, 60));
+  ui->toolButton_9->setFixedHeight(100);
+  ui->toolButton_9->setFixedWidth(100);
+  ui->toolButton_9->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+
+  ui->toolButton_10->setIcon(QIcon(":/images/classes/Measure.svg"));
+  ui->toolButton_10->setIconSize(QSize(60, 60));
+  ui->toolButton_10->setFixedHeight(100);
+  ui->toolButton_10->setFixedWidth(100);
+  ui->toolButton_10->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+
+  ui->toolButton_11->setIcon(QIcon(":/images/menu.svg"));
+  ui->toolButton_11->setIconSize(QSize(60, 60));
+  ui->toolButton_11->setFixedHeight(100);
+  ui->toolButton_11->setFixedWidth(100);
+  ui->toolButton_11->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+
+  ui->toolButton_12->setIcon(QIcon(":/images/edit.svg"));
+  ui->toolButton_12->setIconSize(QSize(60, 60));
+  ui->toolButton_12->setFixedHeight(100);
+  ui->toolButton_12->setFixedWidth(100);
+  ui->toolButton_12->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
 
   ui->label_power->setPixmap(QPixmap(":/images/power.png"));
   //视图场景加载
@@ -194,8 +212,8 @@ void MainWindow::initUI() {
   ui->radioButton_4->setStyleSheet(styleSheet);
   ui->radioButton_4->setChecked(true);
 
-  ui->server_connect_Button->setFixedHeight(60);
-  ui->server_connect_Button->setFixedWidth(60);
+  // ui->server_connect_Button->setFixedHeight(60);
+  // ui->server_connect_Button->setFixedWidth(60);
 //  // 退出
 //  ui->pushButton->setFixedHeight(50);
 //  ui->pushButton->setFixedWidth(100);
@@ -204,14 +222,19 @@ void MainWindow::initUI() {
   ui->groupBox_6->setFixedHeight(100);
   ui->groupBox_7->setFixedHeight(100);
 
-  ui->groupBox_3->setFixedWidth(300);
-  ui->groupBox_8->setFixedWidth(300);
+  ui->groupBox_serverConnect->setFixedWidth(300);
+  ui->groupBox_bagRecord->setFixedWidth(300);
+  ui->groupBox_laserWheelCalib->setFixedWidth(300);
+  ui->groupBox_cameraCalib->setFixedWidth(300);
   ui->groupBox_2->setFixedWidth(300);
 
   // ui->groupBox_3->setStyleSheet("QGroupBox { border: 0 px solid gray; padding: 1px; }");
   // ui->groupBox_8->setStyleSheet("QGroupBox { border: 0 px solid gray; padding: 1px; }");
   // ui->groupBox_2->setStyleSheet("QGroupBox { border: 0 px solid gray; padding: 1px; }");
-  ui->groupBox_8->setHidden(1);
+  ui->groupBox_serverConnect->setHidden(1);
+  ui->groupBox_bagRecord->setHidden(1);
+  ui->groupBox_laserWheelCalib->setHidden(1);
+  ui->groupBox_cameraCalib->setHidden(1);
   ui->groupBox_2->setHidden(1);
 
   ui->label_43->setText(QString::number(roboItem_->param.linear_v));
@@ -320,6 +343,11 @@ void MainWindow::connection() {
                                                                                             this,
                                                                                             10,
                                                                                             true);
+  ipc::DataDispatcher::GetInstance().Subscribe("TaskStop",
+                                                                                              &ros_qt::QNode::TaskStop,
+                                                                                              &qt_ros_node_,
+                                                                                            10,
+                                                                                            true);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -328,8 +356,8 @@ void MainWindow::connection() {
 /// \param modifiers
 ///
 void MainWindow::simulateKeyPress(int keyCode, Qt::KeyboardModifiers modifiers) {
-    QKeyEvent event(QEvent::KeyPress, keyCode, modifiers);
-    QCoreApplication::sendEvent(this, &event);
+  QKeyEvent event(QEvent::KeyPress, keyCode, modifiers);
+  QCoreApplication::sendEvent(this, &event);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -382,6 +410,7 @@ void MainWindow::serverMsgCallback(const std::pair<uint8_t, std::string>& msg) {
     if (orbitNet_packet.ParseFromString(msg.second)) {
       orbit_network_ptr_->Clear(); 
       const auto& nodes = orbitNet_packet.node(); 
+      ipc::DataDispatcher::GetInstance().Publish("TaskStop", true);
 
       for (int i = 0; i < nodes.size(); ++i ) {
         std::vector<float> params;
@@ -400,7 +429,7 @@ void MainWindow::serverMsgCallback(const std::pair<uint8_t, std::string>& msg) {
       }
       roboItem_->Update();  
       // 给调度模块
-      scheduler_ptr_->Run();
+      scheduler_ptr_->Restart();
     } else {
       std::cout << "解析错误，信号类型为路网数据" << "\n";
     }
@@ -720,23 +749,44 @@ void MainWindow::on_checkBox_7_stateChanged(int arg1) {
 /// \brief MainWindow::on_toolButton_3_clicked
 ///   启动
 void MainWindow::on_toolButton_3_clicked() {
-  // hardware_process_->start("roslaunch", QStringList() << "robot_control" << "robot_control.launch");
-  // laser_process_->start("roslaunch", QStringList() << "ydlidar_ros_driver" << "lidar.launch");
-  // 延时1s  不然启动有问题
-  QTime t;
-  t.start();
-  while(t.elapsed()<1000)//1000ms = 1s
-        QCoreApplication::processEvents();
+  static bool flag = 1;
+  if (flag) {
+    hardware_process_->start("roslaunch", QStringList() << "robot_control" << "robot_control.launch");
+    laser_process_->start("roslaunch", QStringList() << "ydlidar_ros_driver" << "lidar.launch");
+    // 延时1s  不然启动有问题
+    QTime t;
+    t.start();
+    while(t.elapsed()<1000)//1000ms = 1s
+          QCoreApplication::processEvents();
 
-  // frontend_process_->start("roslaunch", QStringList() << "calib_fusion_2d" << "frontend_view.launch");
-  // frontend_process_->start("roslaunch", QStringList() << "calib_fusion_2d" << "dataset_frontend_view.launch");
-  frontend_process_->start("roslaunch", QStringList() << "calib_fusion_2d" << "gazebo_frontend.launch");
+    // frontend_process_->start("roslaunch", QStringList() << "calib_fusion_2d" << "frontend_view.launch");
+    // frontend_process_->start("roslaunch", QStringList() << "calib_fusion_2d" << "dataset_frontend_view.launch");
+    // frontend_process_->start("roslaunch", QStringList() << "calib_fusion_2d" << "gazebo_frontend.launch");
+    frontend_process_->start("roslaunch", QStringList() << "calib_fusion_2d" << "frontend.launch");
 
-  QTime t2;
-  t2.start();
-  while(t2.elapsed()<1000)//1000ms = 1s
-        QCoreApplication::processEvents();
-  navigation_process_->start("roslaunch", QStringList() << "move_base" << "gazebo_nav.launch");
+    QTime t2;
+    t2.start();
+    while(t2.elapsed()<1000)//1000ms = 1s
+          QCoreApplication::processEvents();
+    // navigation_process_->start("roslaunch", QStringList() << "move_base" << "gazebo_nav.launch");
+    navigation_process_->start("roslaunch", QStringList() << "move_base" << "nav.launch");
+    ui->toolButton_3->setText("停止");
+  } else {
+    if (frontend_process_->state() == QProcess::Running) {
+        frontend_process_->terminate();
+    }
+    if (navigation_process_->state() == QProcess::Running) {
+        navigation_process_->terminate();
+    }
+    if (laser_process_->state() == QProcess::Running) {
+        laser_process_->terminate();
+    }
+    if (hardware_process_->state() == QProcess::Running) {
+        hardware_process_->terminate();
+    }
+    ui->toolButton_3->setText("运行");
+  }
+  flag = !flag;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -745,24 +795,6 @@ void MainWindow::on_toolButton_3_clicked() {
 void MainWindow::on_toolButton_5_clicked() {
   // qDebug() << "pushButton_reset";
   qt_ros_node_.SetReset();
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// \brief MainWindow::on_toolButton_4_clicked
-/// 停止
-void MainWindow::on_toolButton_4_clicked() {
-  if (frontend_process_->state() == QProcess::Running) {
-      frontend_process_->terminate();
-  }
-  if (navigation_process_->state() == QProcess::Running) {
-      navigation_process_->terminate();
-  }
-  if (laser_process_->state() == QProcess::Running) {
-      laser_process_->terminate();
-  }
-  if (hardware_process_->state() == QProcess::Running) {
-      hardware_process_->terminate();
-  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -810,32 +842,62 @@ void MainWindow::on_toolButton_7_clicked() {
   }
 }
 
-/**
- * @brief MainWindow::on_toolButton_2_clicked
- *   设置目标点
- */
+////////////////////////////////////////////////////////////////////////////////////////////////////////
 void MainWindow::on_toolButton_2_clicked() {
   roboItem_->SetGoal();
 }
 
-
+////////////////////////////////////////////////////////////////////////////////////////////////////////
 void MainWindow::on_toolButton_10_clicked() {
-  ui->groupBox_3->setHidden(1);
-  ui->groupBox_2->setHidden(1);
-  ui->groupBox_8->setHidden(0);
+  static bool flag = 0;
+  if (!flag) {
+    ui->groupBox_2->setHidden(1);
+
+    ui->groupBox_serverConnect->setHidden(1);
+    ui->groupBox_bagRecord->setHidden(1);
+
+    ui->groupBox_laserWheelCalib->setHidden(0);
+    ui->groupBox_cameraCalib->setHidden(0);
+  } else {
+    ui->groupBox_laserWheelCalib->setHidden(1);
+    ui->groupBox_cameraCalib->setHidden(1);
+  }
+  flag = !flag;
 }
 
-
+////////////////////////////////////////////////////////////////////////////////////////////////////////
 void MainWindow::on_toolButton_9_clicked() {
-  ui->groupBox_2->setHidden(1);
-  ui->groupBox_8->setHidden(1);
-  ui->groupBox_3->setHidden(0);
+  static bool flag = 0;
+  if (!flag) {
+    ui->groupBox_2->setHidden(1);
+    ui->groupBox_laserWheelCalib->setHidden(1);
+    ui->groupBox_cameraCalib->setHidden(1);
+    ui->groupBox_serverConnect->setHidden(0);
+    ui->groupBox_bagRecord->setHidden(0);
+  } else {
+    ui->groupBox_serverConnect->setHidden(1);
+    ui->groupBox_bagRecord->setHidden(1);
+  }
+  flag = !flag;
 }
 
-
+////////////////////////////////////////////////////////////////////////////////////////////////////////
 void MainWindow::on_toolButton_11_clicked() {
-  ui->groupBox_3->setHidden(1);
-  ui->groupBox_8->setHidden(1);
-  ui->groupBox_2->setHidden(0);
+  static bool flag = 0;
+  if (!flag) {
+    ui->groupBox_serverConnect->setHidden(1);
+    ui->groupBox_bagRecord->setHidden(1);
+    ui->groupBox_laserWheelCalib->setHidden(1);
+    ui->groupBox_cameraCalib->setHidden(1);
+    ui->groupBox_2->setHidden(0);
+  } else {
+    ui->groupBox_2->setHidden(1);
+  }
+  flag = !flag;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+void MainWindow::on_toolButton_8_clicked() {
+  ipc::DataDispatcher::GetInstance().Publish("TaskStop", true);
 }
 

@@ -27,13 +27,16 @@ roboItem::roboItem() {
 void roboItem::setRobotVis(eRobotColor color) {
   switch (color) {
     case eRobotColor::blue: {
-      robotImg_.load("://images/robot_blue.png");
+      // robotImg_.load("://images/robot_blue.png");
+      robotImg_.load("://images/robot2.png");
     } break;
     case eRobotColor::red: {
-      robotImg_.load("://images/robot_red.png");
+      // robotImg_.load("://images/robot_red.png");
+    robotImg_.load("://images/robot2.png");
     } break;
     case eRobotColor::yellow: {
-      robotImg_.load("://images/robot_yellow.png");
+      // robotImg_.load("://images/robot_yellow.png");
+    robotImg_.load("://images/robot2.png");
     } break;
   }
   QMatrix matrix;

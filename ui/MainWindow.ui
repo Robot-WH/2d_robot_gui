@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1715</width>
-    <height>903</height>
+    <height>1314</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -92,570 +92,6 @@
      <item>
       <layout class="QHBoxLayout" name="horizontalLayout_4">
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_2">
-         <item>
-          <layout class="QVBoxLayout" name="verticalLayout_4">
-           <item>
-            <widget class="QToolButton" name="toolButton_9">
-             <property name="focusPolicy">
-              <enum>Qt::StrongFocus</enum>
-             </property>
-             <property name="text">
-              <string>操作</string>
-             </property>
-             <property name="autoRaise">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QToolButton" name="toolButton_10">
-             <property name="text">
-              <string>标定</string>
-             </property>
-             <property name="autoRaise">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QToolButton" name="toolButton_11">
-             <property name="text">
-              <string>日志</string>
-             </property>
-             <property name="autoRaise">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <spacer name="verticalSpacer">
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>20</width>
-               <height>40</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-          </layout>
-         </item>
-         <item>
-          <layout class="QVBoxLayout" name="verticalLayout_16">
-           <item>
-            <widget class="QGroupBox" name="groupBox_3">
-             <property name="title">
-              <string/>
-             </property>
-             <layout class="QVBoxLayout" name="verticalLayout_7">
-              <item>
-               <widget class="QGroupBox" name="groupBox_5">
-                <property name="font">
-                 <font>
-                  <family>aakar</family>
-                  <pointsize>15</pointsize>
-                  <bold>true</bold>
-                 </font>
-                </property>
-                <property name="title">
-                 <string>系统</string>
-                </property>
-                <layout class="QVBoxLayout" name="verticalLayout_11">
-                 <item>
-                  <widget class="QGroupBox" name="groupBox">
-                   <property name="font">
-                    <font>
-                     <family>aakar</family>
-                     <pointsize>15</pointsize>
-                     <bold>true</bold>
-                    </font>
-                   </property>
-                   <property name="title">
-                    <string>服务器</string>
-                   </property>
-                   <layout class="QGridLayout" name="gridLayout_4">
-                    <item row="1" column="1">
-                     <widget class="QLineEdit" name="line_port_Edit">
-                      <property name="font">
-                       <font>
-                        <family>aakar</family>
-                        <pointsize>15</pointsize>
-                        <bold>false</bold>
-                       </font>
-                      </property>
-                      <property name="text">
-                       <string>9999</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="1" column="0">
-                     <widget class="QLabel" name="label_2">
-                      <property name="font">
-                       <font>
-                        <family>aakar</family>
-                        <pointsize>15</pointsize>
-                        <bold>false</bold>
-                       </font>
-                      </property>
-                      <property name="text">
-                       <string>端口</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="0" column="0">
-                     <widget class="QLabel" name="label">
-                      <property name="font">
-                       <font>
-                        <family>aakar</family>
-                        <pointsize>15</pointsize>
-                        <bold>false</bold>
-                       </font>
-                      </property>
-                      <property name="text">
-                       <string>IP</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="1" column="2">
-                     <widget class="QPushButton" name="server_connect_Button">
-                      <property name="font">
-                       <font>
-                        <family>aakar</family>
-                        <pointsize>15</pointsize>
-                        <bold>false</bold>
-                       </font>
-                      </property>
-                      <property name="text">
-                       <string>连接</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="0" column="1" colspan="2">
-                     <widget class="QLineEdit" name="line_ip_Edit">
-                      <property name="font">
-                       <font>
-                        <family>aakar</family>
-                        <pointsize>15</pointsize>
-                        <bold>false</bold>
-                       </font>
-                      </property>
-                      <property name="text">
-                       <string>192.168.0.101</string>
-                      </property>
-                     </widget>
-                    </item>
-                   </layout>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QGroupBox" name="groupBox_15">
-                   <property name="font">
-                    <font>
-                     <family>aakar</family>
-                     <pointsize>15</pointsize>
-                     <bold>true</bold>
-                    </font>
-                   </property>
-                   <property name="title">
-                    <string>Bag录制</string>
-                   </property>
-                   <layout class="QVBoxLayout" name="verticalLayout_15">
-                    <item>
-                     <layout class="QHBoxLayout" name="horizontalLayout_35">
-                      <item>
-                       <widget class="QLabel" name="label_39">
-                        <property name="font">
-                         <font>
-                          <family>aakar</family>
-                          <pointsize>15</pointsize>
-                          <bold>false</bold>
-                         </font>
-                        </property>
-                        <property name="text">
-                         <string>保存路径</string>
-                        </property>
-                       </widget>
-                      </item>
-                      <item>
-                       <widget class="QPushButton" name="pushButton_6">
-                        <property name="text">
-                         <string/>
-                        </property>
-                       </widget>
-                      </item>
-                     </layout>
-                    </item>
-                    <item>
-                     <widget class="QLineEdit" name="lineEdit">
-                      <property name="font">
-                       <font>
-                        <family>aakar</family>
-                        <pointsize>12</pointsize>
-                        <bold>false</bold>
-                       </font>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <widget class="QPushButton" name="pushButton_7">
-                      <property name="font">
-                       <font>
-                        <family>aakar</family>
-                        <pointsize>15</pointsize>
-                        <bold>false</bold>
-                       </font>
-                      </property>
-                      <property name="text">
-                       <string>保存</string>
-                      </property>
-                     </widget>
-                    </item>
-                   </layout>
-                  </widget>
-                 </item>
-                 <item>
-                  <spacer name="verticalSpacer_3">
-                   <property name="orientation">
-                    <enum>Qt::Vertical</enum>
-                   </property>
-                   <property name="sizeHint" stdset="0">
-                    <size>
-                     <width>20</width>
-                     <height>40</height>
-                    </size>
-                   </property>
-                  </spacer>
-                 </item>
-                </layout>
-               </widget>
-              </item>
-             </layout>
-            </widget>
-           </item>
-           <item>
-            <widget class="QGroupBox" name="groupBox_8">
-             <property name="title">
-              <string/>
-             </property>
-             <layout class="QVBoxLayout" name="verticalLayout_17">
-              <item>
-               <widget class="QGroupBox" name="groupBox_12">
-                <property name="font">
-                 <font>
-                  <family>aakar</family>
-                  <pointsize>20</pointsize>
-                  <bold>true</bold>
-                 </font>
-                </property>
-                <property name="title">
-                 <string>激光轮速标定</string>
-                </property>
-                <layout class="QVBoxLayout" name="verticalLayout_10">
-                 <item>
-                  <layout class="QHBoxLayout" name="horizontalLayout_24">
-                   <item>
-                    <widget class="QLabel" name="label_29">
-                     <property name="font">
-                      <font>
-                       <family>aakar</family>
-                       <pointsize>18</pointsize>
-                       <bold>false</bold>
-                      </font>
-                     </property>
-                     <property name="text">
-                      <string>轮速模型</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
-                    <widget class="QComboBox" name="comboBox">
-                     <property name="font">
-                      <font>
-                       <family>aakar</family>
-                       <pointsize>18</pointsize>
-                       <bold>false</bold>
-                      </font>
-                     </property>
-                     <item>
-                      <property name="text">
-                       <string>差分</string>
-                      </property>
-                     </item>
-                     <item>
-                      <property name="text">
-                       <string>阿克曼</string>
-                      </property>
-                     </item>
-                     <item>
-                      <property name="text">
-                       <string>麦克纳姆轮</string>
-                      </property>
-                     </item>
-                    </widget>
-                   </item>
-                  </layout>
-                 </item>
-                 <item>
-                  <widget class="QPushButton" name="pushButton_4">
-                   <property name="font">
-                    <font>
-                     <family>aakar</family>
-                     <pointsize>18</pointsize>
-                     <bold>true</bold>
-                    </font>
-                   </property>
-                   <property name="text">
-                    <string>开始标定</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <layout class="QHBoxLayout" name="horizontalLayout_26">
-                   <item>
-                    <widget class="QLabel" name="label_26">
-                     <property name="font">
-                      <font>
-                       <family>aakar</family>
-                       <pointsize>18</pointsize>
-                       <bold>false</bold>
-                      </font>
-                     </property>
-                     <property name="text">
-                      <string>轮速平移尺度：</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
-                    <widget class="QLabel" name="label_30">
-                     <property name="font">
-                      <font>
-                       <family>aakar</family>
-                       <pointsize>18</pointsize>
-                       <bold>false</bold>
-                      </font>
-                     </property>
-                     <property name="text">
-                      <string>0.0</string>
-                     </property>
-                     <property name="alignment">
-                      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-                     </property>
-                    </widget>
-                   </item>
-                  </layout>
-                 </item>
-                 <item>
-                  <layout class="QHBoxLayout" name="horizontalLayout_11">
-                   <item>
-                    <widget class="QLabel" name="label_27">
-                     <property name="font">
-                      <font>
-                       <family>aakar</family>
-                       <pointsize>18</pointsize>
-                       <bold>false</bold>
-                      </font>
-                     </property>
-                     <property name="text">
-                      <string>轮速旋转尺度：</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
-                    <widget class="QLabel" name="label_28">
-                     <property name="font">
-                      <font>
-                       <family>aakar</family>
-                       <pointsize>18</pointsize>
-                       <bold>false</bold>
-                      </font>
-                     </property>
-                     <property name="text">
-                      <string>0.0</string>
-                     </property>
-                     <property name="alignment">
-                      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-                     </property>
-                    </widget>
-                   </item>
-                  </layout>
-                 </item>
-                 <item>
-                  <layout class="QHBoxLayout" name="horizontalLayout_30">
-                   <item>
-                    <widget class="QLabel" name="label_33">
-                     <property name="font">
-                      <font>
-                       <family>aakar</family>
-                       <pointsize>18</pointsize>
-                       <bold>false</bold>
-                      </font>
-                     </property>
-                     <property name="text">
-                      <string>外参平移Y：</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
-                    <widget class="QLabel" name="label_34">
-                     <property name="font">
-                      <font>
-                       <family>aakar</family>
-                       <pointsize>18</pointsize>
-                       <bold>false</bold>
-                      </font>
-                     </property>
-                     <property name="text">
-                      <string>0.0</string>
-                     </property>
-                    </widget>
-                   </item>
-                  </layout>
-                 </item>
-                 <item>
-                  <layout class="QHBoxLayout" name="horizontalLayout_28">
-                   <item>
-                    <widget class="QLabel" name="label_31">
-                     <property name="font">
-                      <font>
-                       <family>aakar</family>
-                       <pointsize>18</pointsize>
-                       <bold>false</bold>
-                      </font>
-                     </property>
-                     <property name="text">
-                      <string>外参平移X：</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
-                    <widget class="QLabel" name="label_32">
-                     <property name="font">
-                      <font>
-                       <family>aakar</family>
-                       <pointsize>18</pointsize>
-                       <bold>false</bold>
-                      </font>
-                     </property>
-                     <property name="text">
-                      <string>0.0</string>
-                     </property>
-                     <property name="alignment">
-                      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-                     </property>
-                    </widget>
-                   </item>
-                  </layout>
-                 </item>
-                 <item>
-                  <layout class="QHBoxLayout" name="horizontalLayout_31">
-                   <item>
-                    <widget class="QLabel" name="label_36">
-                     <property name="font">
-                      <font>
-                       <family>aakar</family>
-                       <pointsize>18</pointsize>
-                       <bold>false</bold>
-                      </font>
-                     </property>
-                     <property name="text">
-                      <string>外参旋转：</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
-                    <widget class="QLabel" name="label_35">
-                     <property name="font">
-                      <font>
-                       <family>aakar</family>
-                       <pointsize>18</pointsize>
-                       <bold>false</bold>
-                      </font>
-                     </property>
-                     <property name="text">
-                      <string>0.0</string>
-                     </property>
-                    </widget>
-                   </item>
-                  </layout>
-                 </item>
-                 <item>
-                  <widget class="QPushButton" name="pushButton_8">
-                   <property name="font">
-                    <font>
-                     <family>aakar</family>
-                     <pointsize>18</pointsize>
-                     <bold>true</bold>
-                    </font>
-                   </property>
-                   <property name="text">
-                    <string>保存</string>
-                   </property>
-                  </widget>
-                 </item>
-                </layout>
-               </widget>
-              </item>
-              <item>
-               <widget class="QGroupBox" name="groupBox_13">
-                <property name="font">
-                 <font>
-                  <family>aakar</family>
-                  <pointsize>20</pointsize>
-                  <bold>true</bold>
-                 </font>
-                </property>
-                <property name="title">
-                 <string>相机标定</string>
-                </property>
-                <layout class="QVBoxLayout" name="verticalLayout_14">
-                 <item>
-                  <widget class="QPushButton" name="pushButton_5">
-                   <property name="font">
-                    <font>
-                     <family>aakar</family>
-                     <pointsize>18</pointsize>
-                     <bold>true</bold>
-                    </font>
-                   </property>
-                   <property name="text">
-                    <string>开始标定</string>
-                   </property>
-                  </widget>
-                 </item>
-                </layout>
-               </widget>
-              </item>
-             </layout>
-            </widget>
-           </item>
-           <item>
-            <widget class="QGroupBox" name="groupBox_2">
-             <property name="title">
-              <string/>
-             </property>
-             <layout class="QVBoxLayout" name="verticalLayout_18">
-              <item>
-               <widget class="QTextBrowser" name="msg_output">
-                <property name="font">
-                 <font>
-                  <family>aakar</family>
-                  <pointsize>15</pointsize>
-                  <bold>false</bold>
-                 </font>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </widget>
-           </item>
-          </layout>
-         </item>
-        </layout>
-       </item>
-       <item>
         <layout class="QVBoxLayout" name="verticalLayout_5">
          <property name="spacing">
           <number>0</number>
@@ -668,6 +104,39 @@
            <item>
             <layout class="QHBoxLayout" name="horizontalLayout_32">
              <item>
+              <widget class="QToolButton" name="toolButton_9">
+               <property name="font">
+                <font>
+                 <pointsize>15</pointsize>
+                </font>
+               </property>
+               <property name="focusPolicy">
+                <enum>Qt::StrongFocus</enum>
+               </property>
+               <property name="text">
+                <string>操作</string>
+               </property>
+               <property name="autoRaise">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QToolButton" name="toolButton_10">
+               <property name="font">
+                <font>
+                 <pointsize>15</pointsize>
+                </font>
+               </property>
+               <property name="text">
+                <string>标定</string>
+               </property>
+               <property name="autoRaise">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
               <widget class="QToolButton" name="toolButton_3">
                <property name="font">
                 <font>
@@ -676,21 +145,6 @@
                </property>
                <property name="text">
                 <string>运行</string>
-               </property>
-               <property name="autoRaise">
-                <bool>true</bool>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QToolButton" name="toolButton_4">
-               <property name="font">
-                <font>
-                 <pointsize>15</pointsize>
-                </font>
-               </property>
-               <property name="text">
-                <string>停止</string>
                </property>
                <property name="autoRaise">
                 <bool>true</bool>
@@ -736,6 +190,36 @@
                </property>
                <property name="text">
                 <string>录制</string>
+               </property>
+               <property name="autoRaise">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QToolButton" name="toolButton_12">
+               <property name="font">
+                <font>
+                 <pointsize>15</pointsize>
+                </font>
+               </property>
+               <property name="text">
+                <string>地图管理</string>
+               </property>
+               <property name="autoRaise">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QToolButton" name="toolButton_11">
+               <property name="font">
+                <font>
+                 <pointsize>15</pointsize>
+                </font>
+               </property>
+               <property name="text">
+                <string>日志</string>
                </property>
                <property name="autoRaise">
                 <bool>true</bool>
@@ -803,7 +287,7 @@
                 </font>
                </property>
                <property name="text">
-                <string>轨迹录制</string>
+                <string>停止任务</string>
                </property>
                <property name="autoRaise">
                 <bool>true</bool>
@@ -817,26 +301,474 @@
          <item>
           <layout class="QHBoxLayout" name="horizontalLayout">
            <item>
-            <layout class="QGridLayout" name="gridLayout_5">
-             <item row="2" column="0">
-              <widget class="QPushButton" name="pushButton_minus">
-               <property name="text">
-                <string/>
+            <layout class="QVBoxLayout" name="verticalLayout_16">
+             <item>
+              <widget class="QGroupBox" name="groupBox_serverConnect">
+               <property name="font">
+                <font>
+                 <family>aakar</family>
+                 <pointsize>20</pointsize>
+                 <bold>true</bold>
+                </font>
                </property>
+               <property name="title">
+                <string>服务器</string>
+               </property>
+               <layout class="QGridLayout" name="gridLayout_4">
+                <item row="0" column="2" colspan="2">
+                 <widget class="QLineEdit" name="line_ip_Edit">
+                  <property name="font">
+                   <font>
+                    <family>aakar</family>
+                    <pointsize>20</pointsize>
+                    <bold>false</bold>
+                   </font>
+                  </property>
+                  <property name="text">
+                   <string>192.168.0.101</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="2">
+                 <widget class="QLineEdit" name="line_port_Edit">
+                  <property name="font">
+                   <font>
+                    <family>aakar</family>
+                    <pointsize>20</pointsize>
+                    <bold>false</bold>
+                   </font>
+                  </property>
+                  <property name="text">
+                   <string>9999</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="0">
+                 <widget class="QLabel" name="label">
+                  <property name="font">
+                   <font>
+                    <family>aakar</family>
+                    <pointsize>20</pointsize>
+                    <bold>false</bold>
+                   </font>
+                  </property>
+                  <property name="text">
+                   <string>IP</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="0">
+                 <widget class="QLabel" name="label_2">
+                  <property name="font">
+                   <font>
+                    <family>aakar</family>
+                    <pointsize>20</pointsize>
+                    <bold>false</bold>
+                   </font>
+                  </property>
+                  <property name="text">
+                   <string>端口</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="2">
+                 <widget class="QPushButton" name="server_connect_Button">
+                  <property name="font">
+                   <font>
+                    <family>aakar</family>
+                    <pointsize>20</pointsize>
+                    <bold>false</bold>
+                   </font>
+                  </property>
+                  <property name="text">
+                   <string>连接</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
               </widget>
              </item>
-             <item row="1" column="0">
-              <widget class="QPushButton" name="pushButton_return">
-               <property name="text">
-                <string/>
+             <item>
+              <widget class="QGroupBox" name="groupBox_bagRecord">
+               <property name="font">
+                <font>
+                 <family>aakar</family>
+                 <pointsize>20</pointsize>
+                 <bold>true</bold>
+                </font>
                </property>
+               <property name="title">
+                <string>Bag录制</string>
+               </property>
+               <layout class="QVBoxLayout" name="verticalLayout_15">
+                <item>
+                 <layout class="QHBoxLayout" name="horizontalLayout_35">
+                  <item>
+                   <widget class="QLabel" name="label_39">
+                    <property name="font">
+                     <font>
+                      <family>aakar</family>
+                      <pointsize>20</pointsize>
+                      <bold>false</bold>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>保存路径</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QPushButton" name="pushButton_6">
+                    <property name="text">
+                     <string/>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <widget class="QLineEdit" name="lineEdit">
+                  <property name="font">
+                   <font>
+                    <family>aakar</family>
+                    <pointsize>12</pointsize>
+                    <bold>false</bold>
+                   </font>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="pushButton_7">
+                  <property name="font">
+                   <font>
+                    <family>aakar</family>
+                    <pointsize>20</pointsize>
+                    <bold>false</bold>
+                   </font>
+                  </property>
+                  <property name="text">
+                   <string>保存</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
               </widget>
              </item>
-             <item row="0" column="0">
-              <widget class="QPushButton" name="pushButton_plus">
-               <property name="text">
-                <string/>
+             <item>
+              <widget class="QGroupBox" name="groupBox_laserWheelCalib">
+               <property name="font">
+                <font>
+                 <family>aakar</family>
+                 <pointsize>20</pointsize>
+                 <bold>true</bold>
+                </font>
                </property>
+               <property name="title">
+                <string>激光轮速标定</string>
+               </property>
+               <layout class="QVBoxLayout" name="verticalLayout_3">
+                <item>
+                 <layout class="QHBoxLayout" name="horizontalLayout_24">
+                  <item>
+                   <widget class="QLabel" name="label_29">
+                    <property name="font">
+                     <font>
+                      <family>aakar</family>
+                      <pointsize>18</pointsize>
+                      <bold>false</bold>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>轮速模型</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QComboBox" name="comboBox">
+                    <property name="font">
+                     <font>
+                      <family>aakar</family>
+                      <pointsize>18</pointsize>
+                      <bold>false</bold>
+                     </font>
+                    </property>
+                    <item>
+                     <property name="text">
+                      <string>差分</string>
+                     </property>
+                    </item>
+                    <item>
+                     <property name="text">
+                      <string>阿克曼</string>
+                     </property>
+                    </item>
+                    <item>
+                     <property name="text">
+                      <string>麦克纳姆轮</string>
+                     </property>
+                    </item>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <layout class="QHBoxLayout" name="horizontalLayout_26">
+                  <item>
+                   <widget class="QLabel" name="label_26">
+                    <property name="font">
+                     <font>
+                      <family>aakar</family>
+                      <pointsize>15</pointsize>
+                      <bold>false</bold>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>轮速平移尺度：</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QLabel" name="label_30">
+                    <property name="font">
+                     <font>
+                      <family>aakar</family>
+                      <pointsize>15</pointsize>
+                      <bold>false</bold>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>0.0</string>
+                    </property>
+                    <property name="alignment">
+                     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <layout class="QHBoxLayout" name="horizontalLayout_11">
+                  <item>
+                   <widget class="QLabel" name="label_27">
+                    <property name="font">
+                     <font>
+                      <family>aakar</family>
+                      <pointsize>15</pointsize>
+                      <bold>false</bold>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>轮速旋转尺度：</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QLabel" name="label_28">
+                    <property name="font">
+                     <font>
+                      <family>aakar</family>
+                      <pointsize>15</pointsize>
+                      <bold>false</bold>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>0.0</string>
+                    </property>
+                    <property name="alignment">
+                     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <layout class="QHBoxLayout" name="horizontalLayout_30">
+                  <item>
+                   <widget class="QLabel" name="label_33">
+                    <property name="font">
+                     <font>
+                      <family>aakar</family>
+                      <pointsize>15</pointsize>
+                      <bold>false</bold>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>外参平移Y：</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QLabel" name="label_34">
+                    <property name="font">
+                     <font>
+                      <family>aakar</family>
+                      <pointsize>15</pointsize>
+                      <bold>false</bold>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>0.0</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <layout class="QHBoxLayout" name="horizontalLayout_28">
+                  <item>
+                   <widget class="QLabel" name="label_31">
+                    <property name="font">
+                     <font>
+                      <family>aakar</family>
+                      <pointsize>15</pointsize>
+                      <bold>false</bold>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>外参平移X：</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QLabel" name="label_32">
+                    <property name="font">
+                     <font>
+                      <family>aakar</family>
+                      <pointsize>15</pointsize>
+                      <bold>false</bold>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>0.0</string>
+                    </property>
+                    <property name="alignment">
+                     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <layout class="QHBoxLayout" name="horizontalLayout_31">
+                  <item>
+                   <widget class="QLabel" name="label_36">
+                    <property name="font">
+                     <font>
+                      <family>aakar</family>
+                      <pointsize>15</pointsize>
+                      <bold>false</bold>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>外参旋转：</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QLabel" name="label_35">
+                    <property name="font">
+                     <font>
+                      <family>aakar</family>
+                      <pointsize>15</pointsize>
+                      <bold>false</bold>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>0.0</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <layout class="QHBoxLayout" name="horizontalLayout_2">
+                  <item>
+                   <widget class="QPushButton" name="pushButton_4">
+                    <property name="font">
+                     <font>
+                      <family>aakar</family>
+                      <pointsize>18</pointsize>
+                      <bold>true</bold>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>开始标定</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QPushButton" name="pushButton_8">
+                    <property name="font">
+                     <font>
+                      <family>aakar</family>
+                      <pointsize>18</pointsize>
+                      <bold>true</bold>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>保存</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+               </layout>
+              </widget>
+             </item>
+             <item>
+              <widget class="QGroupBox" name="groupBox_cameraCalib">
+               <property name="font">
+                <font>
+                 <family>aakar</family>
+                 <pointsize>20</pointsize>
+                 <bold>true</bold>
+                </font>
+               </property>
+               <property name="title">
+                <string>相机标定</string>
+               </property>
+               <layout class="QVBoxLayout" name="verticalLayout_4">
+                <item>
+                 <widget class="QPushButton" name="pushButton_5">
+                  <property name="font">
+                   <font>
+                    <family>aakar</family>
+                    <pointsize>18</pointsize>
+                    <bold>true</bold>
+                   </font>
+                  </property>
+                  <property name="text">
+                   <string>开始标定</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+             </item>
+             <item>
+              <widget class="QGroupBox" name="groupBox_2">
+               <property name="font">
+                <font>
+                 <pointsize>20</pointsize>
+                 <bold>true</bold>
+                </font>
+               </property>
+               <property name="title">
+                <string>日志</string>
+               </property>
+               <layout class="QVBoxLayout" name="verticalLayout_18">
+                <item>
+                 <widget class="QTextBrowser" name="msg_output">
+                  <property name="font">
+                   <font>
+                    <family>aakar</family>
+                    <pointsize>15</pointsize>
+                    <bold>false</bold>
+                   </font>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
               </widget>
              </item>
             </layout>
@@ -906,6 +838,31 @@
               </item>
              </layout>
             </widget>
+           </item>
+           <item>
+            <layout class="QGridLayout" name="gridLayout_5">
+             <item row="2" column="0">
+              <widget class="QPushButton" name="pushButton_minus">
+               <property name="text">
+                <string/>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="0">
+              <widget class="QPushButton" name="pushButton_plus">
+               <property name="text">
+                <string/>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="0">
+              <widget class="QPushButton" name="pushButton_return">
+               <property name="text">
+                <string/>
+               </property>
+              </widget>
+             </item>
+            </layout>
            </item>
           </layout>
          </item>
@@ -1122,7 +1079,7 @@
                  <string>局部栅格子图</string>
                 </property>
                 <property name="checked">
-                 <bool>false</bool>
+                 <bool>true</bool>
                 </property>
                </widget>
               </item>

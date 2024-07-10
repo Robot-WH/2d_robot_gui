@@ -118,6 +118,7 @@ void QNode::SubAndPubTopic() {
   // 重置设置话题
   reset_pub = n.advertise<std_msgs::Bool>("cmd_reset", 1);
   task_path_pub = n.advertise<nav_msgs::Path>("task_path", 1);
+  task_stop_pub = n.advertise<std_msgs::Bool>("task_stop", 1);
 
 //  image_transport::ImageTransport it(n);
 //  m_imageMapPub = it.advertise("image/map", 10);
@@ -605,6 +606,14 @@ void QNode::SetReset() {
   std_msgs::Bool flag;
   flag.data = true;
   reset_pub.publish(flag);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+void QNode::TaskStop(const bool& flag) {
+  std_msgs::Bool msg;
+  msg.data = true;
+  std::cout << "TaskStop!!!!" << "\n"; 
+  task_stop_pub.publish(msg);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////

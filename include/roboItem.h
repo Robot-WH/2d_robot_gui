@@ -114,7 +114,7 @@ private:
     int m_zoomState;
     bool m_isMousePress{false};
     bool laser_upside_down_;   // 雷达颠倒
-    bool show_gridmap_flag = false;
+    bool show_gridmap_flag = true;
     QPixmap robotImg_;
     QPixmap arrowImg;
     QPointF m_startPose;
