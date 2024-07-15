@@ -78,6 +78,7 @@ class QNode : public QThread {
   void SetGridMapShowFlag(bool flag);
   void setMainWindowUi(Ui::MainWindow *ui);
   void SetWheelOdomSubscribe(bool flag);
+  void SetSelected(bool flag) {selected_ = flag;}
   bool SocketClientConnect(const int& port, const std::string& ip);
   // 服务
   void laserWheelCalibCall(uint8_t task, bool& result);
@@ -205,6 +206,7 @@ private:
   // gird map是否显示
   bool gridmap_show_flag = true;
   bool ready_pose_ = false, ready_stable_laser_point_ = false;
+  bool selected_ = false;  
   // tf::TransformListener m_tfListener(ros::Duration(10));
   // ros::Timer m_rosTimer;
   QImage Mat2QImage(cv::Mat const &src);

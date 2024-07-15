@@ -405,7 +405,7 @@ void MainWindow::serverMsgCallback(const std::pair<uint8_t, std::string>& msg) {
     } else {
       std::cout << "解析错误，信号类型为运动控制" << "\n";
     }
-  } if (msg.first == 2) {
+  } else if (msg.first == 2) {
     comm::orbitNet::proto::OrbitNetwork orbitNet_packet;
     if (orbitNet_packet.ParseFromString(msg.second)) {
       orbit_network_ptr_->Clear(); 
@@ -432,6 +432,19 @@ void MainWindow::serverMsgCallback(const std::pair<uint8_t, std::string>& msg) {
       scheduler_ptr_->Restart();
     } else {
       std::cout << "解析错误，信号类型为路网数据" << "\n";
+    }
+  } else if (msg.first == 3) {
+    std::cout << "接收到命令" << "\n";
+    comm::cmd::proto::ControlCmd cmd_packet;
+    if (cmd_packet.ParseFromString(msg.second)) {
+      std::string cmd = cmd_packet.cmd();
+      if (cmd == "selected") {
+        qt_ros_node_.SetSelected(true);
+      } else if (cmd == "unselected") {
+        qt_ros_node_.SetSelected(false);
+      }
+    } else {
+      std::cout << "  cmd解析错误，信号类型为命令控制" << "\n";
     }
   }
 }
@@ -751,8 +764,8 @@ void MainWindow::on_checkBox_7_stateChanged(int arg1) {
 void MainWindow::on_toolButton_3_clicked() {
   static bool flag = 1;
   if (flag) {
-    hardware_process_->start("roslaunch", QStringList() << "robot_control" << "robot_control.launch");
-    laser_process_->start("roslaunch", QStringList() << "ydlidar_ros_driver" << "lidar.launch");
+    // hardware_process_->start("roslaunch", QStringList() << "robot_control" << "robot_control.launch");
+    // laser_process_->start("roslaunch", QStringList() << "ydlidar_ros_driver" << "lidar.launch");
     // 延时1s  不然启动有问题
     QTime t;
     t.start();
@@ -761,15 +774,15 @@ void MainWindow::on_toolButton_3_clicked() {
 
     // frontend_process_->start("roslaunch", QStringList() << "calib_fusion_2d" << "frontend_view.launch");
     // frontend_process_->start("roslaunch", QStringList() << "calib_fusion_2d" << "dataset_frontend_view.launch");
-    // frontend_process_->start("roslaunch", QStringList() << "calib_fusion_2d" << "gazebo_frontend.launch");
-    frontend_process_->start("roslaunch", QStringList() << "calib_fusion_2d" << "frontend.launch");
+    frontend_process_->start("roslaunch", QStringList() << "calib_fusion_2d" << "gazebo_frontend.launch");
+    // frontend_process_->start("roslaunch", QStringList() << "calib_fusion_2d" << "frontend.launch");
 
     QTime t2;
     t2.start();
     while(t2.elapsed()<1000)//1000ms = 1s
           QCoreApplication::processEvents();
-    // navigation_process_->start("roslaunch", QStringList() << "move_base" << "gazebo_nav.launch");
-    navigation_process_->start("roslaunch", QStringList() << "move_base" << "nav.launch");
+    navigation_process_->start("roslaunch", QStringList() << "move_base" << "gazebo_nav.launch");
+    // navigation_process_->start("roslaunch", QStringList() << "move_base" << "nav.launch");
     ui->toolButton_3->setText("停止");
   } else {
     if (frontend_process_->state() == QProcess::Running) {

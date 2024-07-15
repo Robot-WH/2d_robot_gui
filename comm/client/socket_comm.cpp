@@ -24,15 +24,14 @@ bool SocketClient::Connect(const int& port, const std::string& ip) {
   //     这是socket()函数的第三个参数，通常被称为协议。在这个例子中，它被设置为0，这意味着系统将自动选择适当的协议。对于SOCK_STREAM和AF_INET的组合，这通常是TCP协议。
   fd_ = socket(AF_INET, SOCK_STREAM, 0);
   if (fd_ == -1) {
-    perror("socker");
+    perror("tcp socker");
     return 0;
   }
   // 绑定本地IP，port
-  struct sockaddr_in address;
-  address.sin_family = AF_INET;
+  address_.sin_family = AF_INET;
   // 将点分十进制的 IP 地址（如 "192.168.1.1"）转换为网络字节序的二进制表示的函数
-  inet_pton(AF_INET, ip.c_str(), &address.sin_addr.s_addr);
-  address.sin_port = htons(port); // 端口号
+  inet_pton(AF_INET, ip.c_str(), &address_.sin_addr.s_addr);
+  address_.sin_port = htons(port); // 端口号
 
   struct timeval timeout;  
   timeout.tv_sec = 2;  // 设置超时为2秒  
@@ -45,15 +44,24 @@ bool SocketClient::Connect(const int& port, const std::string& ip) {
   int ret = setsockopt(fd_, SOL_SOCKET, SO_SNDTIMEO, &timeout, len);
   assert(ret != -1);
 
-  ret = connect(fd_, (struct sockaddr*)&address, sizeof(address));
+  ret = connect(fd_, (struct sockaddr*)&address_, sizeof(address_));
   if (ret == -1) {
     if (errno == EINPROGRESS) {
-      std::cout << "connecting timeout... " << "\n";
+      std::cout << "tcp connecting timeout... " << "\n";
       return 0;
     }
-    std::cout << "error occur when connecting to server " << "\n";
+    std::cout << "error occur when connecting to tcp server " << "\n";
     return 0;
   }
+  // 创建UDP套接字
+  udp_fd_ = socket(AF_INET, SOCK_DGRAM, 0);
+  if (udp_fd_ == -1) {
+    perror("udp socker");
+  } else {
+    bind(udp_fd_, (struct sockaddr *)&address_, sizeof(address_));
+    std::cout << "udp socket OK!" << "\n";  
+  }
+  
   std::thread receive_thread(&SocketClient::receiveThread, this, fd_);
   receive_thread.detach();
   return 1;
@@ -64,7 +72,7 @@ bool SocketClient::Connect(const int& port, const std::string& ip) {
  * @param type
  * @param serialized_message
  */
-void SocketClient::Send(const uint8_t& type, const std::string& serialized_message) {
+void SocketClient::TcpSend(const uint8_t& type, const std::string& serialized_message) {
   if (fd_ < 0) return;
   // 处理粘包的问题，加一个包头数据 
   // 获取消息信息
@@ -75,6 +83,14 @@ void SocketClient::Send(const uint8_t& type, const std::string& serialized_messa
   send(fd_, &info, sizeof(info), MSG_DONTWAIT);
   // 发送序列化数据主体
   send(fd_, serialized_message.data(), serialized_message.size(), MSG_DONTWAIT);
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void SocketClient::UdpSend(const std::string& serialized_message) {
+  if (udp_fd_ < 0) return;
+  sendto(udp_fd_, serialized_message.data(), serialized_message.size(), 
+    0, (struct sockaddr *)&address_, sizeof(address_));
+  std::cout << "udp 发送数据量：" << serialized_message.size() << "\n"; 
 }
 
 /**

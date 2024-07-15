@@ -182,23 +182,30 @@ void QNode::run() {
 /// \brief QNode::sendDataToServer
 ///
 void QNode::sendDataToServer() {
-  // std::unique_lock<std::mutex> lock(mt_obs_); // 锁定互斥锁
-  // cv_obs_.wait(lock, [this] { return this->ready_pose_ && this->ready_stable_laser_point_; }); // 等待 ready 标志位为 true
+  // 基于TCP发送
   comm::obs::proto::ObsPacket obs_packet;
   obs_packet.set_timestamp(fusion_pose_.first);
   obs_packet.add_pose(fusion_pose_.second.x);
   obs_packet.add_pose(fusion_pose_.second.y);
   obs_packet.add_pose(fusion_pose_.second.theta);
+  // 序列化protobuf消息
+  std::string serialized_message;
+  obs_packet.SerializeToString(&serialized_message);
+  client_.TcpSend(1, serialized_message);
+  if (!selected_) {
+    return;
+  }
+  // 通过UDP发送点云与图像数据  
   // 添加stableLaserPoints 激光点云
   for (int i = 0; i < stableLaserPoints.size(); ++i) {
     comm::pose::proto::Vector2f* point = obs_packet.add_stable_laser_points();
     point->set_x(stableLaserPoints[i].x());
     point->set_y(stableLaserPoints[i].y());
   }
-  // 序列化protobuf消息
-  std::string serialized_message;
   obs_packet.SerializeToString(&serialized_message);
-  client_.Send(1, serialized_message);
+  // 如果本机器人被选中，则通过UDP发送实时点云与图像
+  client_.UdpSend(serialized_message);
+  return;  
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
